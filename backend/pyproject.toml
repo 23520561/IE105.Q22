@@ -1,0 +1,27 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "none"
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+license = {text = "none"}
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi (>=0.135.1,<0.136.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)",
+    "pandas (>=3.0.1,<4.0.0)"
+]
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
+]
+[tool.pytest.ini_options] # mandatory section name
+addopts = "-s -v" # force a command line option
+pythonpath = [ # what to add to the python path
+    "."
+]
