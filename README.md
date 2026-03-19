@@ -60,7 +60,7 @@ poetry run uvicorn main:app --reload
 ## 6. Run Tests
 
 ```bash
-poetry run pytest
+make test
 ```
 
 ---
