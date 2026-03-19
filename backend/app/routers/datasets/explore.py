@@ -1,5 +1,5 @@
 from typing import Hashable
-from .dependencies import check_column_numberic
+from .dependencies import check_column_numberic, build_query
 from fastapi import APIRouter, Depends, Query
 import pandas as pd
 import numpy as np
@@ -11,6 +11,20 @@ router = APIRouter(
     tags=["dataset"],
     responses={404: {"description": "Not found"}},
 )
+
+
+@router.get("/filters")
+def query_rows(
+    query: str = Depends(build_query),
+    limit: int = Query(10, ge=1, le=25),
+    offset: int = Query(0, ge=0),
+    df: pd.DataFrame = Depends(get_dataset),
+) -> List[Dict[Hashable, Any]]:
+    filtered_df = df.query(query) if query else df
+
+    # apply limit and offset
+    filtered_df = filtered_df.iloc[offset : offset + limit]
+    return filtered_df.to_dict(orient="records")
 
 
 @router.get("/columns")
