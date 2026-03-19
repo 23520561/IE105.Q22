@@ -143,3 +143,62 @@ def test_boxplot_statistics():
     assert data["outliers"] == [100], (
         f"Expected outlier values to be [100], but got {data['outliers']}"
     )
+
+
+def mock_get_dataset():
+    return pd.DataFrame(
+        {
+            "age": [20, 25, 30, 35, 40],
+            "salary": [3000, 4000, 5000, 6000, 7000],
+            "city": ["HCM", "HN", "HCM", "HN", "HCM"],
+        }
+    )
+
+
+# Assume df has columns: "age", "salary", "city"
+def test_filters_basic():
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+    response = client.get("/dataset/filters?min_age=31")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert isinstance(data, list)
+    # All ages should be >= 31
+    assert all(row["age"] >= 31 for row in data)
+
+
+def test_filters_limit_offset():
+    response = client.get("/dataset/filters?min_age=25&limit=2&offset=1")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == 2  # limit applied
+    # Should be correct slice from dataset
+    assert data[0]["age"] == 30
+    assert data[1]["age"] == 35
+
+
+def test_filters_multiple_conditions():
+    response = client.get("/dataset/filters?min_age=25&city=HCM")
+    assert response.status_code == 200
+
+    data = response.json()
+    # All rows should satisfy both conditions
+    assert all(row["age"] >= 25 and row["city"] == "HCM" for row in data)
+
+
+def test_filters_empty_result():
+    response = client.get("/dataset/filters?max_age=10")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data == []
+
+
+def test_filters_output_format():
+    response = client.get("/dataset/filters?min_age=25")
+    data = response.json()
+
+    # Each row is a dict and contains all expected columns
+    assert all(isinstance(row, dict) for row in data)
+    assert all(key in row for key in ["age", "salary", "city"] for row in data)
