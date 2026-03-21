@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from fastapi import HTTPException
-from app.routers.datasets.dependencies import build_query  # adjust import
+from app.dataset_eda.dependencies import build_query  # adjust import
 
 # Sample DataFrame for testing
 df = pd.DataFrame(

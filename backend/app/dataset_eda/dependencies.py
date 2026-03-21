@@ -1,7 +1,7 @@
 from fastapi import Depends
 import pandas as pd
 from fastapi import HTTPException, Request
-from ...dependencies import get_dataset
+from ..dependencies import get_dataset
 
 
 def check_column_exist(

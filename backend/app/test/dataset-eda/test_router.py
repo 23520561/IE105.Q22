@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 from app.dependencies import get_dataset
-from app.routers.datasets.dependencies import check_column_numberic
+from app.dataset_eda.dependencies import check_column_numberic
 
 # Adjust this import based on where your FastAPI app is located
 import pandas as pd

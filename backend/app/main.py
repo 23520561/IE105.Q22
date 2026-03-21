@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from .routers.datasets import explore
+from app.dataset_eda import router as eda
 
 app = FastAPI()
-app.include_router(explore.router)
+app.include_router(eda.router)
 
 
 @app.get("/")
