@@ -1,3 +1,5 @@
+from app.dataset_eda.schemas import RowsResponse
+from typing import Literal
 from typing import Any, Dict, Hashable, List, Tuple
 
 import numpy as np
@@ -8,7 +10,6 @@ from app.dataset_eda.schemas import (
     ColumnInfoResponse,
     HistogramResponse,
 )
-from app.dataset_eda.ultils import turn_key_to_string
 
 
 class EdaService:
@@ -17,12 +18,13 @@ class EdaService:
         limit: int,
         offset: int,
         df: pd.DataFrame,
-    ) -> List[Dict[Hashable, Any]]:
+    ) -> RowsResponse:
         filtered_df = df.query(query) if query else df
 
         # apply limit and offset
         filtered_df = filtered_df.iloc[offset : offset + limit]
-        return filtered_df.to_dict(orient="records")
+        rows: List[Dict[Hashable, Any]] = filtered_df.to_dict(orient="records")
+        return RowsResponse(rows=rows, count=len(rows))
 
     def get_columns(
         df: pd.DataFrame,
@@ -40,13 +42,12 @@ class EdaService:
                 - "shape": Tuple representing the shape of the DataFrame (rows, columns).
         """
         # Get the columns as a list
-        columnsInfo: Dict[str, Dict[str, Any]] = turn_key_to_string(
-            df.describe().to_dict("index")
+        columnsInfo: Dict[Hashable, Dict[Hashable, Any]] = df.describe().to_dict(
+            "index"
         )
         # Get the first 5 rows (head) of the DataFrame
-        head: List[Dict[str, Any]] = [
-            turn_key_to_string(d) for d in df.head().to_dict(orient="records")
-        ]  # Convert to a list of dictionaries
+        rows = df.head().to_dict(orient="records")  # Convert to a list of dictionaries
+        head = RowsResponse(rows=rows, count=len(rows))
 
         # Get the shape of the DataFrame (rows, columns)
         shape: Tuple[int, int] = df.shape  # This is a tuple (rows, columns)
@@ -148,3 +149,29 @@ class EdaService:
             lower_bound=lower_bound,
             upper_bound=upper_bound,
         )
+
+    def get_duplicated_rows(
+        limit: int,
+        offset: int,
+        df: pd.DataFrame,
+        keep: Literal[False, "first", "last"],
+        subset: None | List[str] = None,
+    ) -> RowsResponse:
+        """
+        Find duplicated rows in a DataFrame.
+
+        Args:
+            df: Input DataFrame
+            subset: Columns to consider (None = all columns)
+            keep: 'first', 'last', or False
+                - 'first': mark duplicates except first occurrence
+                - 'last': mark duplicates except last occurrence
+                - False: mark ALL duplicates
+
+        Returns:
+            DataFrame containing duplicated rows
+        """
+        duplicates_mask = df.duplicated(subset=subset, keep=keep)
+        duplicates_mask = duplicates_mask.iloc[offset : offset + limit]
+        rows = df[duplicates_mask].to_dict("records")
+        return RowsResponse(rows=rows, count=len(rows))

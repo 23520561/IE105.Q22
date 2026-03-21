@@ -1,9 +1,12 @@
+from app.dataset_eda.schemas import RowsResponse
+from app.dataset_eda.dependencies import check_columns_exist
+from typing import Literal
 from app.dataset_eda.schemas import HistogramResponse
 from app.dataset_eda.schemas import BoxPlotResponse
 from app.dataset_eda.schemas import ColumnInfoResponse
 from typing import Annotated
 from app.dataset_eda.schemas import PagingParams
-from typing import Any, Dict, Hashable, List
+from typing import List
 
 import pandas as pd
 from fastapi import APIRouter, Depends, Query
@@ -25,7 +28,7 @@ def get_filtered_rows(
     paging: Annotated[PagingParams, Query()],
     query: str = Depends(build_query),
     df: pd.DataFrame = Depends(get_dataset),
-) -> List[Dict[Hashable, Any]]:
+) -> RowsResponse:
     return EdaService.get_filtered_rows(
         query,
         paging.limit,
@@ -69,3 +72,19 @@ async def get_boxplot_statistics(
     ),  # DataFrame passed via dependency injection
 ) -> BoxPlotResponse:
     return EdaService.get_boxplot_statistics(column_name, df)
+
+
+@router.get("/duplicates")
+def get_duplicates(
+    paging: PagingParams = Depends(),
+    df: pd.DataFrame = Depends(get_dataset),
+    subset: List[str] | None = Depends(check_columns_exist),
+    keep: Literal["first", "last", "false"] = "false",
+) -> RowsResponse:
+    return EdaService.get_duplicated_rows(
+        limit=paging.limit,
+        offset=paging.offset,
+        df=df,
+        subset=subset,
+        keep=False if keep == "false" else keep,
+    )
