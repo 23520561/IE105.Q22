@@ -31,6 +31,8 @@ def test_get_columns():
     response = client.get("/dataset/columns")
     assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
+    data = response.json()
+
     expected_columns = {
         "count": {"feature1": 5.0, "feature2": 5.0},
         "mean": {"feature1": 22.0, "feature2": 3.0},
@@ -42,29 +44,38 @@ def test_get_columns():
         "max": {"feature1": 100.0, "feature2": 5.0},
     }
 
-    actual_columns = response.json().get("columns")
+    # -------------------------
+    # columns check
+    # -------------------------
+    actual_columns = data.get("columns")
     assert actual_columns == expected_columns, (
         f"Expected columns {expected_columns}, got {actual_columns}"
     )
 
-    # Check the shape of the DataFrame (should be 5 rows, 2 columns)
-    expected_shape = [5, 2]  # 5 rows and 2 columns
-    actual_shape = response.json().get("shape")
+    # -------------------------
+    # shape check
+    # -------------------------
+    expected_shape = [5, 2]
+    actual_shape = data.get("shape")
     assert actual_shape == expected_shape, (
         f"Expected shape {expected_shape}, got {actual_shape}"
     )
 
-    # Check the first 5 rows (head)
-    expected_head = [
+    # -------------------------
+    # head check (UPDATED)
+    # -------------------------
+    expected_head_rows = [
         {"feature1": 1, "feature2": 5},
         {"feature1": 2, "feature2": 4},
         {"feature1": 3, "feature2": 3},
         {"feature1": 4, "feature2": 2},
         {"feature1": 100, "feature2": 1},
     ]
-    actual_head = response.json().get("head")
-    assert actual_head == expected_head, (
-        f"Expected head {expected_head}, got {actual_head}"
+
+    actual_head_rows = data.get("head", {}).get("rows")
+
+    assert actual_head_rows == expected_head_rows, (
+        f"Expected head rows {expected_head_rows}, got {actual_head_rows}"
     )
 
 
@@ -162,9 +173,11 @@ def test_filters_basic():
     assert response.status_code == 200
 
     data = response.json()
-    assert isinstance(data, list)
-    # All ages should be >= 31
-    assert all(row["age"] >= 31 for row in data)
+
+    assert isinstance(data["rows"], list)
+    assert isinstance(data["count"], int)
+
+    assert all(row["age"] >= 31 for row in data["rows"])
 
 
 def test_filters_limit_offset():
@@ -172,10 +185,12 @@ def test_filters_limit_offset():
     assert response.status_code == 200
 
     data = response.json()
-    assert len(data) == 2  # limit applied
-    # Should be correct slice from dataset
-    assert data[0]["age"] == 30
-    assert data[1]["age"] == 35
+    rows = data["rows"]
+
+    assert len(rows) == 2
+
+    assert rows[0]["age"] == 30
+    assert rows[1]["age"] == 35
 
 
 def test_filters_multiple_conditions():
@@ -183,8 +198,9 @@ def test_filters_multiple_conditions():
     assert response.status_code == 200
 
     data = response.json()
-    # All rows should satisfy both conditions
-    assert all(row["age"] >= 25 and row["city"] == "HCM" for row in data)
+    rows = data["rows"]
+
+    assert all(row["age"] >= 25 and row["city"] == "HCM" for row in rows)
 
 
 def test_filters_empty_result():
@@ -192,13 +208,114 @@ def test_filters_empty_result():
     assert response.status_code == 200
 
     data = response.json()
-    assert data == []
+
+    assert data["rows"] == []
+    assert data["count"] == 0
 
 
 def test_filters_output_format():
     response = client.get("/dataset/filters?min_age=25")
     data = response.json()
+    rows = data["rows"]
 
-    # Each row is a dict and contains all expected columns
-    assert all(isinstance(row, dict) for row in data)
-    assert all(key in row for key in ["age", "salary", "city"] for row in data)
+    assert all(isinstance(row, dict) for row in rows)
+    assert all(key in row for row in rows for key in ["age", "salary", "city"])
+
+
+def test_get_duplicates_basic():
+    def mock_get_dataset():
+        data = {
+            "feature1": [1, 2, 2, 3, 4, 4, 4],
+            "feature2": [10, 20, 20, 30, 40, 40, 40],
+            "age": [25, 30, 30, 35, 40, 40, 40],
+            "city": ["HCM", "HN", "HN", "DN", "HP", "HP", "HP"],
+        }
+
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+
+    response = client.get("/dataset/duplicates")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "rows" in data
+    assert "count" in data
+
+    assert isinstance(data["rows"], list)
+    assert isinstance(data["count"], int)
+
+    # sanity check: duplicates should exist
+    assert data["count"] == 5
+
+
+def test_get_duplicates_subset():
+
+    response = client.get("/dataset/duplicates?subset=feature1&subset=feature2")
+    assert response.status_code == 200
+
+    data = response.json()
+    rows = data["rows"]
+
+    # ensure all rows exist
+    for row in rows:
+        assert "feature1" in row
+        assert "feature2" in row
+
+
+def test_get_duplicates_keep_false():
+
+    response = client.get("/dataset/duplicates?keep=false")
+    assert response.status_code == 200, (
+        f"\nStatus: {response.status_code}\nDetail: {response.json()}"
+    )
+
+    data = response.json()
+    rows = data["rows"]
+
+    # all duplicate rows should be returned
+    assert isinstance(rows, list)
+
+
+def test_get_duplicates_keep_first():
+
+    response = client.get("/dataset/duplicates?keep=first")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert isinstance(data["rows"], list)
+
+
+def test_get_duplicates_empty():
+    def mock_get_dataset_no_duplicates():
+        data = {
+            "feature1": [1, 2, 3, 4, 5],
+            "feature2": [10, 20, 30, 40, 50],
+            "age": [25, 30, 35, 40, 45],
+            "city": ["HCM", "HN", "DN", "HP", "CT"],
+        }
+
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset_no_duplicates
+
+    response = client.get("/dataset/duplicates")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["rows"] == []
+    assert data["count"] == 0
+
+
+def test_duplicates_logic():
+    response = client.get("/dataset/duplicates")
+    data = response.json()
+    rows = data["rows"]
+
+    # every row should appear more than once in dataset
+    df_rows = pd.DataFrame(rows)
+
+    assert len(df_rows) == data["count"]

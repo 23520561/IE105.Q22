@@ -1,6 +1,12 @@
+from typing import Hashable
 from typing import Any, Dict, List, Tuple
 
 from pydantic import BaseModel, Field
+
+
+class RowsResponse(BaseModel):
+    rows: List[Dict[Hashable, Any]]
+    count: int
 
 
 class PagingParams(BaseModel):
@@ -9,8 +15,8 @@ class PagingParams(BaseModel):
 
 
 class ColumnInfoResponse(BaseModel):
-    columns: Dict[str, Dict[str, Any]]
-    head: List[Dict[str, Any]]
+    columns: Dict[Hashable, Dict[Hashable, Any]]
+    head: RowsResponse
     shape: Tuple[int, int]
 
 

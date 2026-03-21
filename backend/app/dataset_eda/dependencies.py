@@ -1,3 +1,5 @@
+from fastapi import Query
+from typing import List
 from fastapi import Depends
 import pandas as pd
 from fastapi import HTTPException, Request
@@ -10,6 +12,14 @@ def check_column_exist(
     if column_name not in df.columns:
         raise HTTPException(status_code=404, detail="Column not found")
     return column_name
+
+
+def check_columns_exist(
+    column_names: List[str] = Query(default=None),
+) -> List[str] | None:
+    if not column_names:
+        return None
+    return [check_column_exist(c) for c in column_names]
 
 
 def check_column_numberic(
