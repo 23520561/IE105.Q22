@@ -175,3 +175,30 @@ class EdaService:
         duplicates_mask = duplicates_mask.iloc[offset : offset + limit]
         rows = df[duplicates_mask].to_dict("records")
         return RowsResponse(rows=rows, count=len(rows))
+
+    def get_missing_rows(
+        limit: int,
+        offset: int,
+        df: pd.DataFrame,
+        subset: None | List[str] = None,
+    ) -> RowsResponse:
+        """
+        Find rows with missing values in a DataFrame.
+
+        Args:
+            df: Input DataFrame
+            subset: Columns to check (None = all columns)
+
+        Returns:
+            Rows containing missing values
+        """
+        if subset:
+            missing_mask = df[subset].isna().any(axis=1)
+        else:
+            missing_mask = df.isna().any(axis=1)
+        missing_df = df[missing_mask]
+        missing_df = missing_df.iloc[offset : offset + limit]
+
+        rows = missing_df.to_dict("records")
+
+        return RowsResponse(rows=rows, count=len(missing_df))

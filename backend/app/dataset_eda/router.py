@@ -88,3 +88,17 @@ def get_duplicates(
         subset=subset,
         keep=False if keep == "false" else keep,
     )
+
+
+@router.get("/missing")
+def get_missings(
+    paging: PagingParams = Depends(),
+    df: pd.DataFrame = Depends(get_dataset),
+    subset: List[str] | None = Depends(check_columns_exist),
+) -> RowsResponse:
+    return EdaService.get_missing_rows(
+        limit=paging.limit,
+        offset=paging.offset,
+        df=df,
+        subset=subset,
+    )
