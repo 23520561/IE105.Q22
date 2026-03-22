@@ -76,7 +76,7 @@ class EdaService:
                 The histogram is a list of dicts with 'bin_start', 'bin_end', and 'count' for each bin.
         """
         # Compute histogram using numpy
-        col_data = np.asarray(df[column_name])
+        col_data = df[column_name].dropna().to_numpy()
         counts, bin_edges = np.histogram(col_data, bins=bins)
 
         # Prepare the histogram data as a list of dicts
