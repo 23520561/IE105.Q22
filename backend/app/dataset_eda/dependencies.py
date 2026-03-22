@@ -15,11 +15,11 @@ def check_column_exist(
 
 
 def check_columns_exist(
-    column_names: List[str] = Query(default=None),
+    subset: List[str] = Query(default=None), df: pd.DataFrame = Depends(get_dataset)
 ) -> List[str] | None:
-    if not column_names:
+    if not subset:
         return None
-    return [check_column_exist(c) for c in column_names]
+    return [check_column_exist(c, df) for c in subset]
 
 
 def check_column_numberic(

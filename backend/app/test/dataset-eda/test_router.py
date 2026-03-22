@@ -319,3 +319,85 @@ def test_duplicates_logic():
     df_rows = pd.DataFrame(rows)
 
     assert len(df_rows) == data["count"]
+
+
+def test_get_missing_basic():
+    def mock_get_dataset():
+        data = {
+            "feature1": [1, 2, None, 3, 4, None],
+            "feature2": [10, None, 20, 30, None, 40],
+            "age": [25, 30, 30, None, 40, 40],
+            "city": ["HCM", "HN", None, "DN", "HP", "HP"],
+        }
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+
+    response = client.get("/dataset/missing")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "rows" in data
+    assert "count" in data
+
+    assert isinstance(data["rows"], list)
+    assert isinstance(data["count"], int)
+
+    # sanity check: missing values should exist
+    assert data["count"] > 0
+
+
+def test_get_missing_subset():
+    response = client.get("/dataset/missing?subset=feature1&subset=feature2")
+    assert response.status_code == 200
+
+    data = response.json()
+    rows = data["rows"]
+
+    for row in rows:
+        # at least one of subset columns must be None
+        assert row["feature1"] is None or row["feature2"] is None
+
+
+def test_get_missing_pagination():
+    response = client.get("/dataset/missing?limit=2&offset=1")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert len(data["rows"]) <= 2
+
+
+def test_get_missing_empty():
+    def mock_get_dataset_no_missing():
+        data = {
+            "feature1": [1, 2, 3, 4, 5],
+            "feature2": [10, 20, 30, 40, 50],
+            "age": [25, 30, 35, 40, 45],
+            "city": ["HCM", "HN", "DN", "HP", "CT"],
+        }
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset_no_missing
+
+    response = client.get("/dataset/missing")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["rows"] == []
+    assert data["count"] == 0
+
+
+def test_missing_logic():
+    response = client.get("/dataset/missing")
+    data = response.json()
+    rows = data["rows"]
+
+    df_rows = pd.DataFrame(rows)
+
+    # every row should contain at least one missing value
+    assert df_rows.isna().any(axis=1).all()
+
+    assert len(df_rows) == data["count"]
