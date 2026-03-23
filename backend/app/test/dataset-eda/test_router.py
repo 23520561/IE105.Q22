@@ -1,3 +1,4 @@
+from app.dataset_eda.dependencies import check_columns_exist
 from fastapi.testclient import TestClient
 from app.main import app
 from app.dependencies import get_dataset
@@ -491,3 +492,59 @@ def test_pca_not_enough_features():
 
     # depends on your error handling
     assert response.status_code in (400, 422, 500)
+
+
+def test_scatterplot_basic():
+    def mock_get_dataset():
+        return pd.DataFrame(
+            {
+                "a": [1, 2, 3, 4],
+                "b": [10, 20, 30, 40],
+                "c": [100, 200, 300, 400],
+            }
+        )
+
+    def mock_check_columns_exist():
+        return ["a", "b"]
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+    app.dependency_overrides[check_columns_exist] = mock_check_columns_exist
+
+    response = client.get("/dataset/scatterplot?limit=2&offset=1")
+
+    assert response.status_code == 200, f"{response.json()}"
+    data = response.json()
+
+    # structure
+    assert "rows" in data
+    assert "count" in data
+
+    # pagination applied: offset=1, limit=2 → rows index 1,2
+    assert data["count"] == 2
+    assert len(data["rows"]) == 2
+
+    # only selected columns
+    for row in data["rows"]:
+        assert set(row.keys()) == {"a", "b"}
+
+
+def test_scatterplot_pagination():
+    def mock_get_dataset():
+        return pd.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5],
+                "b": [10, 20, 30, 40, 50],
+            }
+        )
+
+    def mock_check_columns_exist():
+        return ["a", "b"]
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+    app.dependency_overrides[check_columns_exist] = mock_check_columns_exist
+
+    response = client.get("/dataset/scatterplot?limit=3&offset=2")
+
+    data = response.json()
+
+    assert data["count"] == 3

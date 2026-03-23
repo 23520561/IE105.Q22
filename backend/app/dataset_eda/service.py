@@ -250,3 +250,9 @@ class EdaService:
             explained_variance=explained_variance,
             total_variance=sum(explained_variance),
         )
+
+    def get_scatterplot(
+        df: pd.DataFrame, subset, limit: int = 100, offset: int = 0
+    ) -> RowsResponse:
+        rows: List = df[subset].iloc[offset : offset + limit].to_dict(orient="records")
+        return RowsResponse(rows=rows, count=len(rows))

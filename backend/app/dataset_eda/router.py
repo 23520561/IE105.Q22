@@ -112,3 +112,14 @@ def get_PCA(df: pd.DataFrame = Depends(get_dataset)) -> PCAResponse:
         return EdaService.get_pca_chart(df)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/scatterplot")
+def get_scatterPlot(
+    paging: PagingParams = Depends(),
+    df: pd.DataFrame = Depends(get_dataset),
+    subset: List[str] | None = Depends(check_columns_exist),
+):
+    if not (subset):
+        raise HTTPException(status_code=400, detail="There is no input columns")
+    return EdaService.get_scatterplot(df, subset, paging.limit, paging.offset)
