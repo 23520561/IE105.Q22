@@ -401,3 +401,93 @@ def test_missing_logic():
     assert df_rows.isna().any(axis=1).all()
 
     assert len(df_rows) == data["count"]
+
+
+def test_get_pca_success():
+    def mock_get_dataset():
+        data = {
+            "feature1": [1, 2, 3, 4, 5],
+            "feature2": [10, 20, 30, 40, 50],
+            "feature3": [5, 4, 3, 2, 1],
+        }
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+
+    response = client.get("/dataset/pca")
+    assert response.status_code == 200, f"{response.json()}"
+
+    data = response.json()
+
+    # structure checks
+    assert "points" in data
+    assert "explained_variance" in data
+    assert "total_variance" in data
+
+    # PCA should return same number of rows
+    assert len(data["points"]) == 5
+
+    # each point has pc1, pc2
+    for point in data["points"]:
+        assert "pc1" in point
+        assert "pc2" in point
+
+    # explained variance should have 2 components
+    assert len(data["explained_variance"]) == 2
+
+    # total variance should be sum
+    assert abs(sum(data["explained_variance"]) - data["total_variance"]) < 1e-6
+
+
+def test_pca_ignores_non_numeric():
+    def mock_get_dataset():
+        data = {
+            "feature1": [1, 2, 3, 4, 5],
+            "feature2": [10, 20, 30, 40, 50],
+            "city": ["HCM", "HN", "DN", "HP", "CT"],  # should be ignored
+        }
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+
+    response = client.get("/dataset/pca")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    # still works with numeric subset
+    assert len(data["points"]) == 5
+
+
+def test_pca_drops_nan():
+    def mock_get_dataset():
+        data = {
+            "feature1": [1, 2, None, 4, 5],
+            "feature2": [10, 20, 30, None, 50],
+        }
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+
+    response = client.get("/dataset/pca")
+    assert response.status_code == 200
+
+    data = response.json()
+
+    # rows with NaN should be dropped → only rows without NaN remain
+    assert len(data["points"]) == 3
+
+
+def test_pca_not_enough_features():
+    def mock_get_dataset():
+        data = {
+            "feature1": [1, 2, 3, 4, 5],  # only 1 column
+        }
+        return pd.DataFrame(data)
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+
+    response = client.get("/dataset/pca")
+
+    # depends on your error handling
+    assert response.status_code in (400, 422, 500)
