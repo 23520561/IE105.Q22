@@ -1,6 +1,9 @@
+from app.dataset_eda.schemas import PCAResponse
 from app.dataset_eda.schemas import RowsResponse
 from typing import Literal
 from typing import Any, Dict, Hashable, List, Tuple
+
+from sklearn.decomposition import PCA
 
 import numpy as np
 import pandas as pd
@@ -76,7 +79,7 @@ class EdaService:
                 The histogram is a list of dicts with 'bin_start', 'bin_end', and 'count' for each bin.
         """
         # Compute histogram using numpy
-        col_data = np.asarray(df[column_name])
+        col_data = df[column_name].dropna().to_numpy()
         counts, bin_edges = np.histogram(col_data, bins=bins)
 
         # Prepare the histogram data as a list of dicts
@@ -202,3 +205,48 @@ class EdaService:
         rows = missing_df.to_dict("records")
 
         return RowsResponse(rows=rows, count=len(missing_df))
+
+    def get_pca_chart(df: pd.DataFrame) -> PCAResponse:
+        """
+        Compute PCA projection for a DataFrame and return 2D coordinates
+        along with explained variance statistics.
+
+        Args:
+            df: Input DataFrame containing numeric columns only.
+                Non-numeric columns are automatically ignored.
+
+        Returns:
+            PCAResponse containing:
+                - points: List of PCA-transformed coordinates.
+                    Each point represents one row from the original dataset:
+                        - pc1: Value along the first principal component
+                        - pc2: Value along the second principal component
+
+                - explained_variance: List of variance ratios explained by each component.
+                    Example: [0.65, 0.25] means:
+                        - PC1 explains 65% of variance
+                        - PC2 explains 25% of variance
+
+                - total_variance: Sum of explained variance of selected components.
+                    Indicates how much information is preserved in the 2D projection.
+        """
+        # Ensure only numeric data is used
+        numeric_df = df.select_dtypes(include="number").dropna()
+        if numeric_df.shape[1] < 2:
+            raise ValueError("Need at least 2 numeric columns for PCA")
+
+        # Fit PCA with 2 components
+        pca = PCA(n_components=2)
+        transformed = pca.fit_transform(numeric_df)
+
+        # Convert PCA result into structured points
+        points = [{"pc1": row[0], "pc2": row[1]} for row in transformed]
+
+        # Explained variance metrics
+        explained_variance: List = pca.explained_variance_ratio_.tolist()
+
+        return PCAResponse(
+            points=points,
+            explained_variance=explained_variance,
+            total_variance=sum(explained_variance),
+        )

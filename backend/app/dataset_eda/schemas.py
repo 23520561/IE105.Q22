@@ -36,3 +36,9 @@ class BoxPlotResponse(BaseModel):
     outliers: List[float | int]
     lower_bound: float | int
     upper_bound: float | int
+
+
+class PCAResponse(BaseModel):
+    points: List[Dict[str, float]]
+    explained_variance: List[float]
+    total_variance: float

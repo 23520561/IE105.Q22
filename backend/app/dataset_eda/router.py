@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+from app.dataset_eda.schemas import PCAResponse
 from app.dataset_eda.schemas import RowsResponse
 from app.dataset_eda.dependencies import check_columns_exist
 from typing import Literal
@@ -102,3 +104,11 @@ def get_missings(
         df=df,
         subset=subset,
     )
+
+
+@router.get("/pca")
+def get_PCA(df: pd.DataFrame = Depends(get_dataset)) -> PCAResponse:
+    try:
+        return EdaService.get_pca_chart(df)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
