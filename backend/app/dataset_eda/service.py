@@ -1,3 +1,5 @@
+from app.dataset_eda.schemas import KDEResponse
+from scipy.stats._kde import gaussian_kde
 from app.dataset_eda.schemas import PCAResponse
 from app.dataset_eda.schemas import RowsResponse
 from typing import Literal
@@ -256,3 +258,11 @@ class EdaService:
     ) -> RowsResponse:
         rows: List = df[subset].iloc[offset : offset + limit].to_dict(orient="records")
         return RowsResponse(rows=rows, count=len(rows))
+
+    def get_KDEplot(df: pd.DataFrame, subset: str) -> KDEResponse:
+        att: pd.Series = df[subset]
+        kde = gaussian_kde(att)
+        x_vals = np.linspace(att.min(), att.max(), 200)
+        y_vals = kde(x_vals)
+        points = [{"x": float(x), "y": float(y)} for x, y in zip(x_vals, y_vals)]
+        return KDEResponse(points=points)

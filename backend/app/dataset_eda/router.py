@@ -1,3 +1,4 @@
+from app.dataset_eda.schemas import KDEResponse
 from fastapi import HTTPException
 from app.dataset_eda.schemas import PCAResponse
 from app.dataset_eda.schemas import RowsResponse
@@ -123,3 +124,11 @@ def get_scatterPlot(
     if not (subset):
         raise HTTPException(status_code=400, detail="There is no input columns")
     return EdaService.get_scatterplot(df, subset, paging.limit, paging.offset)
+
+
+@router.get("/kdeplot")
+def get_kdeplot(
+    df: pd.DataFrame = Depends(get_dataset),
+    subset: str = Depends(check_column_numberic),
+) -> KDEResponse:
+    return EdaService.get_KDEplot(df, subset)

@@ -42,3 +42,7 @@ class PCAResponse(BaseModel):
     points: List[Dict[str, float]]
     explained_variance: List[float]
     total_variance: float
+
+
+class KDEResponse(BaseModel):
+    points: List[Dict[str, float]]
