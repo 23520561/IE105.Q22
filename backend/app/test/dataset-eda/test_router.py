@@ -548,3 +548,54 @@ def test_scatterplot_pagination():
     data = response.json()
 
     assert data["count"] == 3
+
+
+def test_kdeplot_basic():
+    # Mock dependencies
+    def mock_get_dataset():
+        return pd.DataFrame({"value": [1, 2, 3, 4, 5]})
+
+    def mock_check_column_numeric():
+        return "value"
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+    app.dependency_overrides[check_column_numberic] = mock_check_column_numeric
+
+    # Call API
+    response = client.get("/dataset/kdeplot")
+
+    # Assertions
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "points" in data
+    assert len(data["points"]) == 200
+
+    # Check structure
+    first_point = data["points"][0]
+    assert "x" in first_point
+    assert "y" in first_point
+
+    assert isinstance(first_point["x"], float)
+    assert isinstance(first_point["y"], float)
+
+
+def test_kdeplot_different_data():
+    def mock_get_dataset():
+        return pd.DataFrame({"value": [10, 20, 30, 40, 50]})
+
+    def mock_check_column_numeric():
+        return "value"
+
+    app.dependency_overrides[get_dataset] = mock_get_dataset
+    app.dependency_overrides[check_column_numberic] = mock_check_column_numeric
+
+    response = client.get("/dataset/kdeplot")
+    data = response.json()
+
+    assert len(data["points"]) == 200
+
+    # Ensure values are not all zero
+    ys = [p["y"] for p in data["points"]]
+    assert any(y > 0 for y in ys)
