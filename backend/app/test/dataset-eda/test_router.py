@@ -1,11 +1,10 @@
-from app.dataset_eda.dependencies import check_columns_exist
-from fastapi.testclient import TestClient
-from app.main import app
-from app.dependencies import get_dataset
-from app.dataset_eda.dependencies import check_column_numberic
-
 # Adjust this import based on where your FastAPI app is located
 import pandas as pd
+from fastapi.testclient import TestClient
+
+from app.dataset_eda.dependencies import check_column_numberic, check_columns_exist
+from app.dependencies.dataset_action import get_dataset
+from app.main import app
 
 
 # Mock the `get_dataset` dependency for testing purposes

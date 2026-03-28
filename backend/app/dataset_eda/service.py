@@ -1,23 +1,23 @@
-from app.dataset_eda.schemas import KDEResponse
-from scipy.stats._kde import gaussian_kde
-from app.dataset_eda.schemas import PCAResponse
-from app.dataset_eda.schemas import RowsResponse
-from typing import Literal
-from typing import Any, Dict, Hashable, List, Tuple
-
-from sklearn.decomposition import PCA
+from typing import Any, Dict, Hashable, List, Literal, Tuple
 
 import numpy as np
 import pandas as pd
+from scipy.stats._kde import gaussian_kde
+from sklearn.decomposition import PCA
 
 from app.dataset_eda.schemas import (
     BoxPlotResponse,
     ColumnInfoResponse,
+    HeatmapResponse,
     HistogramResponse,
+    KDEResponse,
+    PCAResponse,
+    RowsResponse,
 )
 
 
 class EdaService:
+    @staticmethod
     def get_filtered_rows(
         query: str,
         limit: int,
@@ -31,6 +31,7 @@ class EdaService:
         rows: List[Dict[Hashable, Any]] = filtered_df.to_dict(orient="records")
         return RowsResponse(rows=rows, count=len(rows))
 
+    @staticmethod
     def get_columns(
         df: pd.DataFrame,
     ) -> ColumnInfoResponse:
@@ -63,6 +64,7 @@ class EdaService:
             shape=shape,
         )
 
+    @staticmethod
     def get_column_histogram(
         column_name: str,
         bins: int,
@@ -100,6 +102,7 @@ class EdaService:
             histogram=histogram,
         )
 
+    @staticmethod
     def get_boxplot_statistics(
         column_name: str,
         df: pd.DataFrame,
@@ -155,6 +158,7 @@ class EdaService:
             upper_bound=upper_bound,
         )
 
+    @staticmethod
     def get_duplicated_rows(
         limit: int,
         offset: int,
@@ -181,6 +185,7 @@ class EdaService:
         rows = df[duplicates_mask].to_dict("records")
         return RowsResponse(rows=rows, count=len(rows))
 
+    @staticmethod
     def get_missing_rows(
         limit: int,
         offset: int,
@@ -208,6 +213,7 @@ class EdaService:
 
         return RowsResponse(rows=rows, count=len(missing_df))
 
+    @staticmethod
     def get_pca_chart(df: pd.DataFrame) -> PCAResponse:
         """
         Compute PCA projection for a DataFrame and return 2D coordinates
@@ -253,12 +259,14 @@ class EdaService:
             total_variance=sum(explained_variance),
         )
 
+    @staticmethod
     def get_scatterplot(
         df: pd.DataFrame, subset, limit: int = 100, offset: int = 0
     ) -> RowsResponse:
         rows: List = df[subset].iloc[offset : offset + limit].to_dict(orient="records")
         return RowsResponse(rows=rows, count=len(rows))
 
+    @staticmethod
     def get_KDEplot(df: pd.DataFrame, subset: str) -> KDEResponse:
         att: pd.Series = df[subset]
         kde = gaussian_kde(att)
@@ -266,3 +274,12 @@ class EdaService:
         y_vals = kde(x_vals)
         points = [{"x": float(x), "y": float(y)} for x, y in zip(x_vals, y_vals)]
         return KDEResponse(points=points)
+
+    @staticmethod
+    def get_heatmap(df: pd.DataFrame, subset: List[str]) -> HeatmapResponse:
+        df = df[subset]
+        corr_matrix = df.corr(numeric_only=True)
+
+        return HeatmapResponse(
+            labels=corr_matrix.columns.tolist(), matrix=corr_matrix.values.tolist()
+        )

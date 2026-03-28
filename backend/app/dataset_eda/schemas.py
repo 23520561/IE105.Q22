@@ -1,5 +1,4 @@
-from typing import Hashable
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Hashable, List, Tuple
 
 from pydantic import BaseModel, Field
 
@@ -46,3 +45,8 @@ class PCAResponse(BaseModel):
 
 class KDEResponse(BaseModel):
     points: List[Dict[str, float]]
+
+
+class HeatmapResponse(BaseModel):
+    labels: List[str]
+    matrix: list[list[float]]
