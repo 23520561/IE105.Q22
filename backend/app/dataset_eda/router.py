@@ -1,22 +1,22 @@
-from app.dataset_eda.schemas import KDEResponse
-from fastapi import HTTPException
-from app.dataset_eda.schemas import PCAResponse
-from app.dataset_eda.schemas import RowsResponse
-from app.dataset_eda.dependencies import check_columns_exist
-from typing import Literal
-from app.dataset_eda.schemas import HistogramResponse
-from app.dataset_eda.schemas import BoxPlotResponse
-from app.dataset_eda.schemas import ColumnInfoResponse
-from typing import Annotated
-from app.dataset_eda.schemas import PagingParams
-from typing import List
+from typing import Annotated, List, Literal
 
 import pandas as pd
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
+from app.dataset_eda.dependencies import check_columns_exist
+from app.dataset_eda.schemas import (
+    BoxPlotResponse,
+    ColumnInfoResponse,
+    HeatmapResponse,
+    HistogramResponse,
+    KDEResponse,
+    PagingParams,
+    PCAResponse,
+    RowsResponse,
+)
 from app.dataset_eda.service import EdaService
+from app.dependencies.dataset_action import get_dataset
 
-from ..dependencies import get_dataset
 from .dependencies import build_query, check_column_numberic
 
 router = APIRouter(
@@ -132,3 +132,11 @@ def get_kdeplot(
     subset: str = Depends(check_column_numberic),
 ) -> KDEResponse:
     return EdaService.get_KDEplot(df, subset)
+
+
+@router.get("/heatmap")
+def get_heatmap(
+    df: pd.DataFrame = Depends(get_dataset),
+    subset: List[str] = Depends(check_columns_exist),
+) -> HeatmapResponse:
+    return EdaService.get_heatmap(df=df, subset=subset)
