@@ -1,101 +1,111 @@
 import pandas as pd
 import numpy as np
 
-# -----------------------
-# Helper
-# -----------------------
-def _val(x: pd.Series | float):
-    return x.values if isinstance(x, pd.Series) else x
+# =============================================================
+# Math Functions - Always return pd.Series
+# Original parameter signatures preserved
+# =============================================================
+
+def _to_series(x) -> pd.Series:
+    """Convert input to pandas Series. Always returns Series."""
+    if isinstance(x, pd.Series):
+        return x
+    # scalar or numpy array -> Series
+    return pd.Series(x, dtype='float64')
 
 
 # -----------------------
 # Basic Math
 # -----------------------
-def add(a: pd.Series | float, b: pd.Series | float):
-    a, b = _val(a), _val(b)
-    return a + b
+def add(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
+    return _to_series(a) + _to_series(b)
 
 
-def sub(a: pd.Series | float, b: pd.Series | float):
-    a, b = _val(a), _val(b)
-    return a - b
+def sub(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
+    return _to_series(a) - _to_series(b)
 
 
-def mul(a: pd.Series | float, b: pd.Series | float):
-    a, b = _val(a), _val(b)
-    return a * b
+def mul(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
+    return _to_series(a) * _to_series(b)
 
 
-def div(a: pd.Series | float, b: pd.Series | float):
-    a, b = _val(a), _val(b)
-    out = np.full(np.broadcast(a, b).shape, np.nan, dtype=np.float64)
-    return np.divide(a, b, out=out, where=b != 0)
+def div(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
+    a_s = _to_series(a)
+    b_s = _to_series(b)
+    # Safe division: NaN when b == 0
+    return a_s / b_s.where(b_s != 0, np.nan)
 
 
-def mod(a: pd.Series | float, b: pd.Series | float):
-    a, b = _val(a), _val(b)
-    out = np.full(np.broadcast(a, b).shape, np.nan, dtype=np.float64)
-    return np.mod(a, b, out=out, where=b != 0)
+def mod(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
+    a_s = _to_series(a)
+    b_s = _to_series(b)
+    # Safe modulo: NaN when b == 0
+    return a_s % b_s.where(b_s != 0, np.nan)
 
 
 # -----------------------
 # Power
 # -----------------------
-def power(a: pd.Series | float, b: pd.Series | float):
-    a, b = _val(a), _val(b)
-    return np.power(a, b)
+def power(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
+    return _to_series(a) ** _to_series(b)
 
 
 # -----------------------
-# Log (unified)
-# log(a, base)
+# Log (unified) - log(a, base)
 # -----------------------
-def log(a: pd.Series | float, base: pd.Series | float):
-    a, base = _val(a), _val(base)
-
-    out = np.full(np.broadcast(a, base).shape, np.nan, dtype=np.float64)
-
-    return np.divide(
-        np.log(a),
-        np.log(base),
-        out=out,
-        where=(a > 0) & (base > 0) & (base != 1)
-    )
-
-def sin(x: pd.Series | float, deg: int = 0):
-    if deg not in [0,1]:
-        raise ValueError("is deg must in 0 1")
-    x = _val(x)
-    if deg:
-        x = np.deg2rad(x)
-    return np.sin(x)
+def log(a: pd.Series | float, base: pd.Series | float) -> pd.Series:
+    a_s = _to_series(a)
+    base_s = _to_series(base)
+    
+    condition = (a_s > 0) & (base_s > 0) & (base_s != 1)
+    
+    ln_a = np.log(a_s)
+    ln_base = np.log(base_s)
+    
+    return (ln_a / ln_base).where(condition, np.nan)
 
 
-def cos(x: pd.Series | float, deg: int = 0):
-    if deg not in [0,1]:
-        raise ValueError("is deg must in 0 1")
-    x = _val(x)
-    if deg:
-        x = np.deg2rad(x)
-    return np.cos(x)
+# -----------------------
+# Trigonometric Functions
+# -----------------------
+def sin(x: pd.Series | float, deg: int = 0) -> pd.Series:
+    if deg not in [0, 1]:
+        raise ValueError("deg must be 0 or 1")
+    
+    x_s = _to_series(x)
+    if deg == 1:
+        x_s = np.deg2rad(x_s)
+    return pd.Series(np.sin(x_s), dtype='float64')
 
 
-def tan(x: pd.Series | float, deg: int = 0):
-    if deg not in [0,1]:
-        raise ValueError("is deg must in 0 1")
-    x = _val(x)
-    if deg:
-        x = np.deg2rad(x)
-    return np.tan(x)
+def cos(x: pd.Series | float, deg: int = 0) -> pd.Series:
+    if deg not in [0, 1]:
+        raise ValueError("deg must be 0 or 1")
+    
+    x_s = _to_series(x)
+    if deg == 1:
+        x_s = np.deg2rad(x_s)
+    return pd.Series(np.cos(x_s), dtype='float64')
 
 
-def cot(x: pd.Series | float, deg: int = 0):
-    if deg not in [0,1]:
-        raise ValueError("is deg must in 0 1")
-    x = _val(x)
-    if deg:
-        x = np.deg2rad(x)
+def tan(x: pd.Series | float, deg: int = 0) -> pd.Series:
+    if deg not in [0, 1]:
+        raise ValueError("deg must be 0 or 1")
+    
+    x_s = _to_series(x)
+    if deg == 1:
+        x_s = np.deg2rad(x_s)
+    return pd.Series(np.tan(x_s), dtype='float64')
 
-    t = np.tan(x)
-    out = np.full_like(t, np.nan, dtype=np.float64)
-    return np.divide(1.0, t, out=out, where=t != 0)
+
+def cot(x: pd.Series | float, deg: int = 0) -> pd.Series:
+    if deg not in [0, 1]:
+        raise ValueError("deg must be 0 or 1")
+    
+    x_s = _to_series(x)
+    if deg == 1:
+        x_s = np.deg2rad(x_s)
+    
+    t = np.tan(x_s)
+    result = 1.0 / t
+    return pd.Series(result, dtype='float64').where(t != 0, np.nan)

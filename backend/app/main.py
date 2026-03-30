@@ -1,11 +1,18 @@
-from fastapi import FastAPI
+import sys
+import os
 
-from app.dataset_eda import router as eda
+
+import pandas as pd
+from fastapi import FastAPI
+from app.feature_engineering.services.exp_eval import ExpressionEvaluator
+
+
 
 app = FastAPI()
-app.include_router(eda.router)
 
 
 @app.get("/")
 async def read_main():
     return {"msg": "Hello World"}
+
+

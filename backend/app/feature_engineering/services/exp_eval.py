@@ -1,4 +1,8 @@
 import re
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 import numpy as np
 import pandas as pd
@@ -42,35 +46,37 @@ class ExpressionEvaluator:
                     raise ValueError("unsupported function")
                 tmp = func_name
                 self.valid_pan.append("(")
+                self.index += 1
                 parameter1 = self.check_syntax(expression, expr_len)
                 if func_name in trigo_ops.keys():
                     parameter2 = 0
                     if expression[self.index] == ",":
                         is_deg = self.check_syntax(expression, expr_len)
                         if is_deg not in [0, 1]:
-                            raise ValueError("is_deg must be 0 or 1")
+                            raise ValueError("is_deg must be 0 o 1")
                         func_stack.append([func_name, parameter1, is_deg])
+
                 if expression[self.index] == ",":
                     self.index += 1
                     parameter2 = self.check_syntax(expression, expr_len)
                     func_stack.append([func_name, parameter1, parameter2])
+
+                tmp = ""
             elif expression[self.index] == "#":
                 self.index += 1
                 col_name = ""
-                isIncremented = False
                 while (
                     self.index < expr_len
                     and expression[self.index] not in ops.keys()
-                    and expression[self.index] != ")"
+                    and expression[self.index] not in [")", ","]
                 ):
                     col_name += expression[self.index]
                     self.index += 1
-                    isIncremented = True
-                if isIncremented:
-                    self.index -= 1
+
                 if col_name not in self.dfs:
                     raise ValueError(f"column not found, {col_name}")
                 tmp = col_name
+                continue
             elif expression[self.index] == "(":
                 self.valid_pan.append("(")
                 self.index += 1
@@ -78,8 +84,10 @@ class ExpressionEvaluator:
             elif expression[self.index] in ops:
                 if self.index + 1 < expr_len and expression[self.index + 1] in ops:
                     raise ValueError("syntax error")
-                func_stack.append(tmp)
-                tmp = ""
+                if tmp != "":
+                    func_stack.append(tmp)
+                    tmp = ""
+
                 ops_stack.append(expression[self.index])
                 self.index += 1
                 continue
@@ -93,7 +101,7 @@ class ExpressionEvaluator:
                     raise ValueError("syntax error")
                 self.valid_pan.pop()
                 self.valid_pan.append(",")
-                if tmp:
+                if tmp != "":
                     func_stack.append(tmp)
                 self.sub_expressions.append(
                     {"func_stack": func_stack, "ops_stack": ops_stack}
@@ -102,8 +110,9 @@ class ExpressionEvaluator:
             elif expression[self.index] == ")":
                 if not self.valid_pan:
                     raise ValueError("syntax error")
-                if tmp:
+                if tmp != "":
                     func_stack.append(tmp)
+                self.valid_pan.pop()
                 self.sub_expressions.append(
                     {"func_stack": func_stack, "ops_stack": ops_stack}
                 )
@@ -121,14 +130,19 @@ class ExpressionEvaluator:
         self.index = 0
         self.dfs = df
         expression = expression.replace(" ", "")
+        if expression[0] != "(" and expression[-1] != ")":
+            expression = f"({expression})"
         self.check_syntax(expression, len(expression))
+        if self.valid_pan:
+            raise ValueError("syntax error")
         self.recalculate()
         df[new_col] = self.dp_result.get(-1, None)
 
     def calc(self, func_stack, ops_stack):
         vals = func_stack[:]
         ops_local = ops_stack[:]  # tránh đè lên input
-
+        if not ops_local:
+            return func_stack[0]
         priority = {"+": 1, "-": 1, "*": 2, "/": 2, "%": 2}
 
         i = 0
@@ -165,8 +179,6 @@ class ExpressionEvaluator:
             return False
 
     def apply_parameter(self, small_funcs):
-        print(f"small func: {small_funcs}")
-        print(f"dp_result: {self.dp_result}")
         for i in range(len(small_funcs)):
             func = small_funcs[i]
             if isinstance(func, str):
