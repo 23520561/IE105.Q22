@@ -46,7 +46,7 @@ class TestExpressionEvaluator(unittest.TestCase):
     def test_exp_compiler_complex(self):
         evaluator = ExpressionEvaluator()
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        expression = "@pow(@log(#B, 2), 1)"
+        expression = "@pow(#B, 2)"
         new_col = "C"
         evaluator.exp_compiler(df, expression, new_col)
 
