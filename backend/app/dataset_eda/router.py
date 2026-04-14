@@ -5,16 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.dataset_eda.dependencies import check_columns_exist
 from app.dataset_eda.schemas import (
-    BoxPlotResponse,
-    ColumnInfoResponse,
-    HeatmapResponse,
-    HistogramResponse,
     KDEResponse,
     PagingParams,
-    PCAResponse,
     RowsResponse,
 )
-from app.dataset_eda.service import EdaService
+import app.dataset_eda.service as EdaService
 from app.dependencies.dataset_action import get_dataset
 
 from .dependencies import build_query, check_column_numberic
@@ -26,7 +21,31 @@ router = APIRouter(
 )
 
 
-@router.get("/filters")
+@router.get("/prebuilt")
+def get_prebuild_dataset():
+    return [
+        {
+            "id": "iris",
+            "name": "Iris Dataset",
+            "image": "Deceased",
+            "description": "Containing 150 samples of iris flowers with four features each, used to classify them into three species: setosa, versicolor, and virginica. It’s small, clean, and ideal for beginners learning multiclass classification.",
+        },
+        {
+            "id": "wine",
+            "name": "Wine Dataset",
+            "image": "Wine_Bar",
+            "description": "Having 178 samples of wines with 13 chemical features, classified into three cultivars. It’s commonly used to practice feature analysis and multiclass classification models.",
+        },
+        {
+            "id": "breast",
+            "name": "Breast Cancer Dataset",
+            "image": "Oncology",
+            "description": "Including 569 samples of cell nuclei features, labeled as malignant or benign tumors. It’s a classic binary classification dataset used in medical machine learning applications.",
+        },
+    ]
+
+
+@router.get("/rows/filters")
 def get_filtered_rows(
     paging: Annotated[PagingParams, Query()],
     query: str = Depends(build_query),
@@ -40,48 +59,11 @@ def get_filtered_rows(
     )
 
 
-@router.get("/columns")
-async def get_columns(
-    df: pd.DataFrame = Depends(get_dataset),
-) -> ColumnInfoResponse:
-    return EdaService.get_columns(df)
-
-
-# Get histogram statistics for a single column
-@router.get("/columns/{column_name}/histogram")
-async def get_column_histogram(
-    column_name: str = Depends(
-        check_column_numberic
-    ),  # The column name (from the URL path)
-    bins: int = Query(10, ge=1, le=100),  # Number of bins, must be between 1 and 100
-    df: pd.DataFrame = Depends(
-        get_dataset
-    ),  # The DataFrame passed via the Depends function
-) -> HistogramResponse:
-    return EdaService.get_column_histogram(
-        column_name,
-        bins,
-        df,
-    )
-
-
-@router.get("/columns/{column_name}/boxplot")
-async def get_boxplot_statistics(
-    column_name: str = Depends(
-        check_column_numberic
-    ),  # Column name of the numeric column to check
-    df: pd.DataFrame = Depends(
-        get_dataset
-    ),  # DataFrame passed via dependency injection
-) -> BoxPlotResponse:
-    return EdaService.get_boxplot_statistics(column_name, df)
-
-
-@router.get("/duplicates")
+@router.get("/rows/duplicated")
 def get_duplicates(
     paging: PagingParams = Depends(),
     df: pd.DataFrame = Depends(get_dataset),
-    subset: List[str] | None = Depends(check_columns_exist),
+    subset: List[str] = Depends(check_columns_exist),
     keep: Literal["first", "last", "false"] = "false",
 ) -> RowsResponse:
     return EdaService.get_duplicated_rows(
@@ -93,7 +75,7 @@ def get_duplicates(
     )
 
 
-@router.get("/missing")
+@router.get("/rows/missing")
 def get_missings(
     paging: PagingParams = Depends(),
     df: pd.DataFrame = Depends(get_dataset),
@@ -105,14 +87,6 @@ def get_missings(
         df=df,
         subset=subset,
     )
-
-
-@router.get("/pca")
-def get_PCA(df: pd.DataFrame = Depends(get_dataset)) -> PCAResponse:
-    try:
-        return EdaService.get_pca_chart(df)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/scatterplot")
@@ -132,11 +106,3 @@ def get_kdeplot(
     subset: str = Depends(check_column_numberic),
 ) -> KDEResponse:
     return EdaService.get_KDEplot(df, subset)
-
-
-@router.get("/heatmap")
-def get_heatmap(
-    df: pd.DataFrame = Depends(get_dataset),
-    subset: List[str] = Depends(check_columns_exist),
-) -> HeatmapResponse:
-    return EdaService.get_heatmap(df=df, subset=subset)

@@ -15,10 +15,10 @@ def check_column_exist(
 
 
 def check_columns_exist(
-    subset: List[str] = Query(default=None), df: pd.DataFrame = Depends(get_dataset)
-) -> List[str] | None:
+    subset: List[str] = Query(...), df: pd.DataFrame = Depends(get_dataset)
+) -> List[str]:
     if not subset:
-        return None
+        raise HTTPException(status_code=400, detail=f"Invalid subset: {subset}")
     return [check_column_exist(c, df) for c in subset]
 
 
@@ -33,7 +33,9 @@ def check_column_numberic(
 
 def build_query(request: Request, df: pd.DataFrame = Depends(get_dataset)) -> str:
     filters = {
-        k: v for k, v in request.query_params.items() if k not in {"limit", "offset"}
+        k: v
+        for k, v in request.query_params.items()
+        if k not in {"limit", "offset", "dataset_id"}
     }
     expressions = []
 
