@@ -6,6 +6,9 @@ from app.server_stat import router as ServerStat
 from app.dataset_transfer import router as Storage
 from app.dataset_column import router as Column
 from app.dataset_chart import router as Chart
+from app.feature_encoding import router as Encoding
+from app.feature_transformation import router as Transformation
+from app.pipeline import router as Pipeline
 
 app = FastAPI()
 app.include_router(eda.router)
@@ -13,6 +16,10 @@ app.include_router(ServerStat.router)
 app.include_router(Storage.router)
 app.include_router(Column.router)
 app.include_router(Chart.router)
+app.include_router(Encoding.router)
+app.include_router(Transformation.router)
+app.include_router(Pipeline.router)
+
 
 app.add_middleware(
     CORSMiddleware,

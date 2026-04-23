@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getPcaChart, type pcaChartType } from "./api";
 import { initChartStyle } from "./styles";
 import * as echarts from "echarts";
-import { getCssVar } from "./helper";
+import { getCssVar, rangingColor } from "./helper";
 
 const PcaChart = function ({ datasetId }: { datasetId: string }) {
   const chartRef = useRef(null);
@@ -24,10 +24,11 @@ const PcaChart = function ({ datasetId }: { datasetId: string }) {
     fetchData();
   }, [datasetId]);
   useEffect(() => {
+    const labels = [...new Set(pcaChart.points.map((p) => p[2]))];
     const chartStyle = initChartStyle();
     let option = {
       tooltip: {
-        position: "top",
+        show: false,
       },
       grid: {
         height: "70%",
@@ -60,14 +61,18 @@ const PcaChart = function ({ datasetId }: { datasetId: string }) {
         },
       },
       visualMap: {
+        type: "piecewise",
         dimension: 2,
         calculable: true,
         orient: "horizontal",
         left: "center",
-        max: Math.max(...pcaChart.points.map((p) => p[2])),
-        min: Math.min(...pcaChart.points.map((p) => p[2])),
+        categories: labels,
         inRange: {
-          color: [getCssVar("--color-primary"), getCssVar("--color-error")],
+          color: rangingColor(
+            getCssVar("--color-primary"),
+            getCssVar("--color-error"),
+            labels.length,
+          ),
         },
         textStyle: {
           color: chartStyle.fontColor,
@@ -79,21 +84,20 @@ const PcaChart = function ({ datasetId }: { datasetId: string }) {
         {
           name: "punch card",
           type: "scatter",
+          large: true,
           data: pcaChart.points,
           label: {
             color: chartStyle.fontColor,
-            fontfamily: chartStyle.fontFamily,
-            fontsize: chartStyle.fontSize,
+            fontFamily: chartStyle.fontFamily,
+            fontSize: chartStyle.fontSize,
           },
           itemstyle: {
             color: getCssVar("--color-surface-container-low"),
-            bordercolor: getCssVar("--color-surface-container-low"),
-            borderwidth: 5,
-            borderradius: 5,
+            borderColor: getCssVar("--color-surface-container-low"),
           },
           emphasis: {
             itemstyle: {
-              shadowblur: 10,
+              shadowBlur: 10,
               symbolSize: 30,
               shadowcolor: "rgba(0, 0, 0, 0.5)",
             },
@@ -106,7 +110,7 @@ const PcaChart = function ({ datasetId }: { datasetId: string }) {
     return () => {
       chart.dispose();
     };
-  }, []);
+  }, [pcaChart]);
   return <div ref={chartRef} style={{ height: "400px", width: "100%" }}></div>;
 };
 export default PcaChart;

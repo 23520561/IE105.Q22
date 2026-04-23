@@ -53,3 +53,34 @@ export async function getPcaChart(
   const prefix = `/dataset/charts/pca?${param}`;
   return await getData<pcaChartType>(apiUrl + prefix);
 }
+export type kdeChartType = {
+  points: [number, number][];
+};
+export async function getKdeChart(
+  datasetId: string,
+  columnName: string,
+): Promise<kdeChartType | null> {
+  const param = new URLSearchParams({
+    dataset_id: datasetId,
+    column_name: columnName,
+  });
+  const prefix = `/dataset/charts/kde?${param}`;
+  return await getData<kdeChartType>(apiUrl + prefix);
+}
+export type scatterPlotType = {
+  points: [number, number][];
+};
+
+export async function getScatterPlot(
+  datasetId: string,
+  columns: [string, string],
+): Promise<scatterPlotType | null> {
+  const params = new URLSearchParams({
+    dataset_id: datasetId,
+  });
+
+  columns.forEach((col) => params.append("subset", col));
+
+  const prefix = `/dataset/charts/scatter?${params}`;
+  return await getData<scatterPlotType>(apiUrl + prefix);
+}

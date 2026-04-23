@@ -1,30 +1,38 @@
+import type { typeListType } from "./charts/helper";
+
 const FeatureSelection = function ({
   typeLists,
   selectedFeature,
   chooseHandler,
 }: {
-  typeLists: Record<string, string | undefined>[];
+  typeLists: typeListType[];
   selectedFeature: string;
   chooseHandler: (e: string | undefined) => void;
 }) {
   return (
-    <div className="bg-surface-container rounded-xl p-6 border border-white/5">
+    <div className="bg-surface-container rounded-xl p-6 border border-white/5 border-l-amber- h-full overflow-scroll">
       <h4 className="text-xs font-bold text-white mb-4 flex items-center gap-2">
         <span className="material-symbols-outlined text-sm">tune</span> Feature
         Selection
       </h4>
       <div className="space-y-2">
-        {typeLists.map((e) => {
+        {typeLists.map((e, i) => {
           if (!e.type) {
             return (
-              <div className="flex items-center gap-3 p-2 rounded bg-primary/10 border border-primary/20 cursor-pointer">
+              <div
+                key={i}
+                className="flex items-center gap-3 p-2 rounded bg-primary/10 border border-primary/20 cursor-pointer"
+              >
                 Please consider hoping our server is working fine
               </div>
             );
           }
           if (e.name === selectedFeature) {
             return (
-              <div className="flex items-center gap-3 p-2 rounded bg-primary/10 border border-primary/20 cursor-pointer">
+              <div
+                key={e.name}
+                className="flex items-center gap-3 p-2 rounded bg-primary/10 border border-primary/20 cursor-pointer"
+              >
                 <div className="w-3 h-3 rounded-full bg-primary shrink-0"></div>
                 <span className="text-xs text-white truncate" title={e.name}>
                   {e.name}
@@ -37,6 +45,7 @@ const FeatureSelection = function ({
           }
           return (
             <div
+              key={i}
               className="flex items-center gap-3 p-2 rounded hover:bg-surface-variant/40 cursor-pointer group transition-colors"
               onClick={() => {
                 chooseHandler(e.name);

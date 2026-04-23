@@ -1,3 +1,4 @@
+from app.dataset_chart.schemas import ScatterPlotResponse
 from typing import List
 
 import numpy as np
@@ -107,20 +108,28 @@ def get_boxplot_statistics(
     )
 
 
-# def get_scatterplot(
-#     df: pd.DataFrame, subset, limit: int = 100, offset: int = 0
-# ) -> RowsResponse:
-#     rows: List = df[subset].iloc[offset : offset + limit].to_dict(orient="records")
-#     return RowsResponse(rows=rows, count=len(rows))
-#
+def get_scatterplot(
+    df: pd.DataFrame, subset, limit: int = 100, offset: int = 0
+) -> ScatterPlotResponse:
+    sliced = df[subset].iloc[offset : offset + limit]
+
+    # Validate all columns are numeric
+    non_numeric = [
+        col for col in sliced.columns if not pd.api.types.is_numeric_dtype(sliced[col])
+    ]
+    if non_numeric:
+        raise ValueError(f"Non-numeric columns found: {non_numeric}")
+
+    points = sliced.astype(float).values.tolist()
+    return ScatterPlotResponse(points=points)
 
 
-def get_KDEplot(df: pd.DataFrame, subset: str) -> KDEResponse:
-    att: pd.Series = df[subset]
+def get_KDEplot(df: pd.DataFrame, column_name: str) -> KDEResponse:
+    att: pd.Series = df[column_name]
     kde = gaussian_kde(att)
-    x_vals = np.linspace(att.min(), att.max(), 200)
-    y_vals = kde(x_vals)
-    points = [{"x": float(x), "y": float(y)} for x, y in zip(x_vals, y_vals)]
+    x_vals = np.linspace(att.min(), att.max(), 200).round(2)
+    y_vals = kde(x_vals).round(2)
+    points = [[float(x), float(y)] for x, y in zip(x_vals, y_vals)]
     return KDEResponse(points=points)
 
 

@@ -1,24 +1,21 @@
-import HeatMap from "~/eda/charts/HeatMap";
 import type { Route } from "./+types/eda";
 import HistogramChart from "~/eda/charts/HistogramChart";
 import { useEffect, useState } from "react";
-import {
-  getColumnsInfo,
-  getDuplicatedRows,
-  getMissingRows,
-  type columnsInfo,
-} from "~/eda/api";
+import { getDuplicatedRows, getMissingRows } from "~/eda/api";
 import { useParams } from "react-router";
 import FeatureSelection from "~/eda/FeatureSelection";
 import { formatNumber } from "~/eda/helper";
 import RawDataInspector from "~/eda/RawDataInspector";
 import PcaChart from "~/eda/charts/PcaChart";
+import { useDataset } from "~/customHooks/useDataset";
+import KdeChart from "~/eda/charts/KdeChart";
+import EdaCarousel from "~/eda/EdaCarousel";
 export function meta({}: Route.MetaArgs) {
   return [{ title: "EDA | The Observational Engine" }];
 }
 const Eda = function () {
   const datasetId = useParams()?.datasetId ?? "";
-  const [info, setInfo] = useState<columnsInfo>({ shape: [0, 0], columns: {} });
+  const { info, chooseFeatureHandler, loading } = useDataset(datasetId);
   const [expand, setExpand] = useState(false);
   type rowSumaryStatType = {
     missing: number;
@@ -38,46 +35,24 @@ const Eda = function () {
   }));
   useEffect(() => {
     async function fetchData() {
-      const data = await getColumnsInfo(datasetId);
-      if (data) {
+      if (!loading) {
         const [missing, duplicated] = await Promise.all([
-          getMissingRows(datasetId, Object.keys(data.columns)),
-          getDuplicatedRows(datasetId, Object.keys(data.columns)),
+          getMissingRows(datasetId, Object.keys(info.columns)),
+          getDuplicatedRows(datasetId, Object.keys(info.columns)),
         ]);
-        Object.values(data.columns).forEach((c, i) => {
-          if (i === 0) {
-            c.selected = true;
-          } else {
-            c.selected = false;
-          }
-        });
         if (missing && duplicated) {
           setRowSumaryStat({
             missing: missing.count,
             duplicated: duplicated.count,
           });
         }
-        setInfo(data);
       }
     }
     fetchData();
-  }, []);
+  }, [loading]);
   function expandHandler() {
     setExpand(!expand);
     return !expand;
-  }
-  function chooseHandler(name: string | undefined) {
-    if (!info || !name) {
-      return;
-    }
-    Object.keys(info.columns).forEach((key) => {
-      if (key === name) {
-        info.columns[key].selected = true;
-      } else {
-        info.columns[key].selected = false;
-      }
-    });
-    setInfo({ ...info, columns: { ...info.columns } });
   }
   return (
     <main className="flex-1 overflow-hidden flex flex-col bg-surface-dim">
@@ -190,6 +165,10 @@ const Eda = function () {
                   columnName={selectedColumn}
                   max={info.shape[0]}
                 ></HistogramChart>
+                <KdeChart
+                  datasetId={datasetId}
+                  columnName={selectedColumn}
+                ></KdeChart>
               </div>
 
               <div className="bg-surface-container-low rounded-xl p-6 border border-white/5 shadow-sm">
@@ -208,19 +187,20 @@ const Eda = function () {
                 <PcaChart datasetId={datasetId}></PcaChart>
               </div>
             </div>
-            <RawDataInspector
-              expand={expand}
-              expandHandler={expandHandler}
-              datasetId={datasetId}
-              columns={Object.keys(info.columns)}
-            ></RawDataInspector>
+            {/* <RawDataInspector */}
+            {/*   expand={expand} */}
+            {/*   expandHandler={expandHandler} */}
+            {/*   datasetId={datasetId} */}
+            {/*   columns={Object.keys(info.columns)} */}
+            {/* ></RawDataInspector> */}
+            <EdaCarousel datasetId={datasetId}></EdaCarousel>
           </div>
 
           <div className="col-span-3 space-y-6">
             <FeatureSelection
               typeLists={typeList}
               selectedFeature={selectedColumn}
-              chooseHandler={chooseHandler}
+              chooseHandler={chooseFeatureHandler}
             ></FeatureSelection>
 
             <div className="bg-surface-container rounded-xl p-6 border border-white/5">

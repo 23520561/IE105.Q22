@@ -27,8 +27,12 @@ class PCAResponse(BaseModel):
     total_variance: float
 
 
+class ScatterPlotResponse(BaseModel):
+    points: List[List[float]]
+
+
 class KDEResponse(BaseModel):
-    points: List[Dict[str, float]]
+    points: List[List[float]]
 
 
 class HeatmapResponse(BaseModel):

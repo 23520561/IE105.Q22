@@ -51,6 +51,7 @@ const HeatMap = function ({
       yAxis: {
         type: "category",
         data: heatMap?.labels,
+        inverse: true,
         axisLabel: {
           color: chartStyle.fontColor,
           fontFamily: chartStyle.fontFamily,
@@ -84,6 +85,8 @@ const HeatMap = function ({
           label: {
             show: true,
             color: chartStyle.fontColor,
+            textBorderColor: getCssVar("--color-surface-container-low"),
+            textBorderWidth: 2,
             fontFamily: chartStyle.fontFamily,
             fontSize: chartStyle.fontSize,
           },

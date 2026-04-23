@@ -1,18 +1,17 @@
 from typing import Annotated, List, Literal
 
-import pandas as pd
+from app.dependencies.dataset_action import DatasetContext
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.dataset_eda.dependencies import check_columns_exist
 from app.dataset_eda.schemas import (
-    KDEResponse,
     PagingParams,
     RowsResponse,
 )
 import app.dataset_eda.service as EdaService
 from app.dependencies.dataset_action import get_dataset
 
-from .dependencies import build_query, check_column_numberic
+from .dependencies import build_query
 
 router = APIRouter(
     prefix="/dataset",
@@ -49,8 +48,9 @@ def get_prebuild_dataset():
 def get_filtered_rows(
     paging: Annotated[PagingParams, Query()],
     query: str = Depends(build_query),
-    df: pd.DataFrame = Depends(get_dataset),
+    context: DatasetContext = Depends(get_dataset),
 ) -> RowsResponse:
+    df = context.df
     return EdaService.get_filtered_rows(
         query,
         paging.limit,
@@ -62,10 +62,11 @@ def get_filtered_rows(
 @router.get("/rows/duplicated")
 def get_duplicates(
     paging: PagingParams = Depends(),
-    df: pd.DataFrame = Depends(get_dataset),
+    context: DatasetContext = Depends(get_dataset),
     subset: List[str] = Depends(check_columns_exist),
     keep: Literal["first", "last", "false"] = "false",
 ) -> RowsResponse:
+    df = context.df
     return EdaService.get_duplicated_rows(
         limit=paging.limit,
         offset=paging.offset,
@@ -78,9 +79,10 @@ def get_duplicates(
 @router.get("/rows/missing")
 def get_missings(
     paging: PagingParams = Depends(),
-    df: pd.DataFrame = Depends(get_dataset),
+    context: DatasetContext = Depends(get_dataset),
     subset: List[str] | None = Depends(check_columns_exist),
 ) -> RowsResponse:
+    df = context.df
     return EdaService.get_missing_rows(
         limit=paging.limit,
         offset=paging.offset,
@@ -92,17 +94,10 @@ def get_missings(
 @router.get("/scatterplot")
 def get_scatterPlot(
     paging: PagingParams = Depends(),
-    df: pd.DataFrame = Depends(get_dataset),
+    context: DatasetContext = Depends(get_dataset),
     subset: List[str] | None = Depends(check_columns_exist),
 ):
+    df = context.df
     if not (subset):
         raise HTTPException(status_code=400, detail="There is no input columns")
     return EdaService.get_scatterplot(df, subset, paging.limit, paging.offset)
-
-
-@router.get("/kdeplot")
-def get_kdeplot(
-    df: pd.DataFrame = Depends(get_dataset),
-    subset: str = Depends(check_column_numberic),
-) -> KDEResponse:
-    return EdaService.get_KDEplot(df, subset)

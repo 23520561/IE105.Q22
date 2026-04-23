@@ -5,6 +5,7 @@ export function useRowsHook(
   expand: boolean,
   datasetId: string,
   newPage: number,
+  refresh: boolean,
 ) {
   type dataset = {
     rows: (number | string)[][];
@@ -27,7 +28,7 @@ export function useRowsHook(
       }
     }
     fetchData();
-  }, [expand, newPage]);
+  }, [expand, newPage, refresh]);
 
   return { rows, loading };
 }

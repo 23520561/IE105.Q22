@@ -1,15 +1,20 @@
-import pandas as pd
-import service as transformation
+from app.pipeline.service import save_pipeline
+from app.dependencies.dataset_action import DatasetContext
+from app.dependencies.dataset_action import get_dataset
+from fastapi import Depends
+import app.feature_transformation.service as transformation
 from fastapi import APIRouter
 
 from .schemas import TransformRequest
 
-router = APIRouter(prefix="/transformation", tags=["Transformation"])
+router = APIRouter(prefix="/features/transformation", tags=["Transformation"])
 
 
 @router.post("/")
-def transform_data(req: TransformRequest):
-    df = pd.DataFrame(req.data)
+def transform_data(
+    req: TransformRequest, context: DatasetContext = Depends(get_dataset)
+):
+    df = context.df
     method = req.method
     if method == "log":
         df = transformation.log_transform(df, req.columns)
@@ -27,4 +32,7 @@ def transform_data(req: TransformRequest):
         df = transformation.normalize(df, req.columns)
     else:
         raise ValueError("Unsupported transformation method")
-    return {"data": df.to_dict("records")}
+    context.steps.append(req)
+    save_pipeline(context.dataset_id, context.steps)
+
+    return True

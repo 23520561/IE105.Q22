@@ -1,7 +1,7 @@
 import { apiUrl, getData } from "~/api";
 
 type stat = "count" | "mean" | "std" | "min" | "25%" | "50%" | "75%" | "max";
-interface columnStat extends Record<stat, number | null> {
+export interface columnStat extends Record<stat, number | null> {
   type: string;
   selected: boolean;
 }
