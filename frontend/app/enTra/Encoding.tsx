@@ -1,11 +1,12 @@
-import encodingMethods from "~/enTra/encodingMethod.json";
-import type { PipelineStepType } from "./api";
+import { EncodingMethod } from "./api";
+import type { PipelineStepType } from "../pipeline/PipelineStepType";
+import type { EncodingMethodType } from "./api";
 const Encoding = function ({
   encodingHandler,
   pipeline,
   selectedFeature,
 }: {
-  encodingHandler: (method: string, i: number) => void;
+  encodingHandler: (method: EncodingMethodType, i: number) => void;
   pipeline: PipelineStepType[];
   selectedFeature: string;
 }) {
@@ -30,11 +31,12 @@ const Encoding = function ({
             Encoding Method
           </label>
           <div className="grid grid-cols-3 gap-2">
-            {encodingMethods.map((method) => {
+            {EncodingMethod.map((method) => {
               const index = pipeline.findIndex(
                 (step) =>
-                  step.column === selectedFeature &&
-                  step.method === method.toLowerCase(),
+                  step.type === "encoding" &&
+                  step.data.column === selectedFeature &&
+                  step.data.method === method.toLowerCase(),
               );
               return (
                 <button

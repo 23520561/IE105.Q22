@@ -10,12 +10,12 @@ const FeatureSelection = function ({
   chooseHandler: (e: string | undefined) => void;
 }) {
   return (
-    <div className="bg-surface-container rounded-xl p-6 border border-white/5 border-l-amber- h-full overflow-scroll">
+    <div className="bg-surface-container rounded-xl p-6 border border-white/5 border-l-amber- h-full flex flex-col">
       <h4 className="text-xs font-bold text-white mb-4 flex items-center gap-2">
         <span className="material-symbols-outlined text-sm">tune</span> Feature
         Selection
       </h4>
-      <div className="space-y-2">
+      <div className="space-y-2 overflow-y-auto flex-1 min-h-0">
         {typeLists.map((e, i) => {
           if (!e.type) {
             return (

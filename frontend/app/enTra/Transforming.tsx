@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { transform, type PipelineStepType } from "./api";
+import {
+  transform,
+  TransformationRequest,
+  type TransformationMethodType,
+} from "./api";
 
 type Props = {
   datasetId: string;
@@ -10,15 +14,15 @@ type Props = {
 const Transforming = function ({ datasetId, selectedColumns, refresh }: Props) {
   const [loading, setLoading] = useState(false);
 
-  const handleTransform = async (method: PipelineStepType["method"]) => {
+  const handleTransform = async (method: TransformationMethodType) => {
     if (!selectedColumns.length) return;
 
     setLoading(true);
 
-    await transform(datasetId, {
-      method,
-      columns: selectedColumns,
-    });
+    await transform(
+      datasetId,
+      new TransformationRequest(method, selectedColumns),
+    );
 
     setLoading(false);
     refresh();
@@ -51,7 +55,7 @@ const Transforming = function ({ datasetId, selectedColumns, refresh }: Props) {
           <select
             disabled={loading}
             onChange={(e) => {
-              const map: Record<string, PipelineStepType["method"]> = {
+              const map: Record<string, TransformationMethodType> = {
                 standard: "standard",
                 minmax: "minmax",
                 robust: "robust",

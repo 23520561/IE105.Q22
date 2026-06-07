@@ -23,7 +23,7 @@ const PrebuiltDatasets = function () {
         const color = ["primary", "tertiary", "secondary"][i % 3];
         return (
           <Link
-            to={`/encode&transform/${dataset.id}`}
+            to={`/imbalance/${dataset.id}`}
             state={{ datasetId: dataset.id }}
             key={i}
             className="bg-surface-container-low rounded-xl p-6 border border-white/5 hover:bg-surface-container-high transition-all group cursor-pointer"

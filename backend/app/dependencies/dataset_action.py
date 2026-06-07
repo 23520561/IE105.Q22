@@ -1,7 +1,6 @@
-from app.feature_transformation.schemas import TransformRequest
+from app.pipeline.schemas import StepType
 from dataclasses import dataclass
 from app.pipeline.service import load_pipeline
-from app.feature_encoding.schemas import EncodingRequest
 from pathlib import Path
 from typing import List, cast
 
@@ -20,7 +19,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 class DatasetContext:
     dataset_id: str
     df: pd.DataFrame
-    steps: list[EncodingRequest | TransformRequest]
+    steps: list[StepType]
 
 
 def get_dataset(dataset_id: str = Query(...)):

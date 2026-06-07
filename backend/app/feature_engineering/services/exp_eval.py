@@ -1,4 +1,8 @@
 import re
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 import numpy as np
 import pandas as pd
@@ -126,13 +130,13 @@ class ExpressionEvaluator:
         self.index = 0
         self.dfs = df
         expression = expression.replace(" ", "")
-        if expression[0] != "(" and expression[-1] != ")":
+        if expression[0] != "(" or expression[-1] != ")":
             expression = f"({expression})"
         self.check_syntax(expression, len(expression))
         if self.valid_pan:
             raise ValueError("syntax error")
         self.recalculate()
-        df[new_col] = self.dp_result.get(-1, None)
+        df[new_col] = self.dp_result.get(len(self.dp_result) - 1)
 
     def calc(self, func_stack, ops_stack):
         vals = func_stack[:]
@@ -159,7 +163,6 @@ class ExpressionEvaluator:
         for i, op in enumerate(ops_local):
             result = ops[op](result, vals[i + 1])
 
-        print(result)
         return result
 
     def calculate_subexp(self, subexp, index, dp_result):

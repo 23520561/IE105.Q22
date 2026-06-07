@@ -17,21 +17,21 @@ def extract_datetime(df, column):
 # 5. TEXT FEATURES (The "Silent Killer" of performance)
 def text_length(df, column, new_col: str):
     if not new_col:
-        raise ValueError(f"Column required")
+        raise ValueError("Column required")
     df[new_col] = df[column].astype(str).str.len()
     return df
 
 
 def word_count(df, column, new_col: str):
     if not new_col:
-        raise ValueError(f"Column required")
+        raise ValueError("Column required")
     df[new_col] = df[column].astype(str).str.split().str.len()
     return df
 
 
 def text_sentiment(df, column: str, new_col: str):
     if not new_col:
-        raise ValueError(f"Column required")
+        raise ValueError("Column required")
     df[new_col] = [TextBlob(str(x)).sentiment.polarity for x in df[column]]  # type: ignore
     return df
 
@@ -39,14 +39,14 @@ def text_sentiment(df, column: str, new_col: str):
 # 6. BOOLEAN / FLAGS
 def flag_missing(df: pd.DataFrame, column: str, new_col: str):
     if not new_col:
-        raise ValueError(f"Column required")
+        raise ValueError("Column required")
     df[new_col] = df[column].isna().to_numpy(np.int8)
     return df
 
 
 # 2. AGGREGATION (Use 'transform' to avoid the slow 'merge')
-def groupby_agg(df, group_col, agg_col, new_col: str, agg_func="mean"):
+def groupby_agg(df, group_col: list[str], agg_col: str, new_col: str, agg_func="mean"):
     if not new_col:
-        raise ValueError(f"Column required")
+        raise ValueError("Column required")
     df[new_col] = df.groupby(group_col)[agg_col].transform(agg_func)
     return df

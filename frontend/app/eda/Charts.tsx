@@ -12,7 +12,9 @@ const Charts = function ({
 }) {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [selectedChart, setSelectedChart] = useState<string>("Scatter Plot");
-  const selectedChartProps = chartList.find((e) => e.name === selectedChart);
+  const selectedChartProps: plotType | undefined = chartList.find(
+    (e) => e.name === selectedChart,
+  );
   const propBuilders: Record<number, () => object> = {
     2: () => ({
       subset: [selectedFeatures[0], selectedFeatures[1]],
@@ -23,14 +25,18 @@ const Charts = function ({
       max: 100,
       datasetId,
     }),
+    0: () => ({
+      datasetId,
+    }),
     [-1]: () => ({
       subset: selectedFeatures,
       datasetId,
     }),
   };
 
-  const passedProps =
-    propBuilders[selectedChartProps?.requiredColumn ?? NaN]?.() ?? {};
+  const passedProps = selectedChartProps
+    ? propBuilders[selectedChartProps.requiredColumn]()
+    : {};
   function chooseChartHandler(name: string) {
     setSelectedChart(name);
   }

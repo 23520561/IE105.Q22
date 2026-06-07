@@ -1,3 +1,4 @@
+from app.pipeline.schemas import StepType
 from app.pipeline.service import save_pipeline
 from app.dependencies.dataset_action import DatasetContext
 from pathlib import Path
@@ -38,7 +39,7 @@ def encode_data(req: EncodingRequest, context: DatasetContext = Depends(get_data
         encoding.ordinal_encode(context.df, req.column, req.mapping)
     else:
         raise ValueError("Unsupported encoding method")
-    context.steps.append(req)
+    context.steps.append(StepType(type="encoding", data=req))
 
     save_pipeline(context.dataset_id, context.steps)
     return True

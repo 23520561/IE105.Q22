@@ -1,5 +1,4 @@
-import { prefix } from "@react-router/dev/routes";
-import type { PipelineStepType } from "./enTra/api";
+import type { PipelineStepType } from "./pipeline/PipelineStepType";
 
 export const apiUrl = import.meta.env.VITE_API_URL;
 export async function getData<T>(url: string): Promise<T | null> {

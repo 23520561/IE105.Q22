@@ -38,10 +38,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-background text-on-surface font-body selection:bg-primary/30">
         <NavigationBar></NavigationBar>
-        <div className="flex min-h-[calc(100vh-3.5rem)]">
+        <main className="flex min-h-[calc(100vh-3.5rem)]">
           <SideBar></SideBar>
           {children}
-        </div>
+        </main>
         <ScrollRestoration />
         <Scripts />
       </body>

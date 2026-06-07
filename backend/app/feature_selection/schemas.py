@@ -37,9 +37,3 @@ class AnalyzedFeatures(BaseModel):
 class ReductionResponse(BaseModel):
     method: Literal["pca", "umap"]
     data: Any
-
-
-class TransformRequest(BaseModel):
-    data: list[dict]
-    method: str  # "log", "sqrt", "minmax", "standard", "robust", "power", "normalize"
-    columns: list[str]

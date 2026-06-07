@@ -5,19 +5,15 @@ import FeatureSelection from "~/eda/FeatureSelection";
 import { createTypeList } from "~/eda/charts/helper";
 import Encoding from "~/enTra/Encoding";
 import {
+  EncodingRequest,
   enconding,
   type EncodingMethodType,
-  type PipelineStepType,
 } from "~/enTra/api";
+import { type PipelineStepType } from "~/pipeline/PipelineStepType";
 import EdaCarousel from "~/eda/EdaCarousel";
-import { useEffect, useState } from "react";
-import {
-  deleteStepPipeline,
-  getPipeline,
-  type PipelineResponseType,
-} from "~/api";
-import { PipelineList } from "~/enTra/PipelineList";
+import { PipelineList } from "~/pipeline/PipelineList";
 import Transforming from "~/enTra/Transforming";
+import { usePipeline } from "~/customHooks/usePipeline";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Encoding and Transform" }];
@@ -25,49 +21,28 @@ export function meta({}: Route.MetaArgs) {
 const EncodingTransform = function () {
   const datasetId = useParams()?.datasetId ?? "";
   const { info, chooseFeatureHandler } = useDataset(datasetId);
+  const { pipeline, refreshHandler, deleteHandler } = usePipeline(datasetId);
   const typeList = createTypeList(info.columns);
-  const [pipeline, setPipeline] = useState<PipelineResponseType>([]);
-  const [refresh, setRefresh] = useState<boolean>(false);
   const selectedColumn =
     Object.keys(info.columns).find(
       (key) => info?.columns[key].selected === true,
     ) ?? "";
-  async function encodingHandler(method: string, i: number) {
-    const req: PipelineStepType = {
-      method: method.toLowerCase() as EncodingMethodType,
+  async function encodingHandler(method: EncodingMethodType, i: number) {
+    const req = new EncodingRequest(method, {
       columns: Object.keys(info.columns),
       column: selectedColumn,
-    };
+    });
     if (i !== -1) {
+      deleteHandler(i);
+    } else {
       try {
-        await deleteStepPipeline(datasetId, i);
-        setRefresh(!refresh);
-        return;
+        await enconding(datasetId, req);
+        refreshHandler();
       } catch {
-        console.log("error");
+        console.log("Error");
       }
-    }
-    try {
-      await enconding(datasetId, req);
-      setRefresh(!refresh);
-    } catch {
-      console.log("Error");
     }
   }
-
-  useEffect(() => {
-    async function fetchData() {
-      if (!datasetId) return;
-
-      const data = await getPipeline(datasetId);
-
-      if (data) {
-        setPipeline(data);
-      }
-    }
-
-    fetchData();
-  }, [datasetId, refresh]);
 
   return (
     <>
@@ -99,7 +74,7 @@ const EncodingTransform = function () {
         </header>
 
         <div className="flex-1 p-8 grid grid-cols-12 gap-6 overflow-y-auto custom-scrollbar">
-          <section className="col-span-12 lg:col-span-4 flex flex-col gap-4">
+          <section className="col-span-12 lg:col-span-3 flex flex-col gap-4">
             <FeatureSelection
               typeLists={typeList}
               selectedFeature={selectedColumn}
@@ -107,14 +82,11 @@ const EncodingTransform = function () {
             ></FeatureSelection>
             <PipelineList
               pipeline={pipeline}
-              refresh={() => {
-                setRefresh(!refresh);
-              }}
-              datasetId={datasetId}
+              deleteHandler={deleteHandler}
             ></PipelineList>
           </section>
 
-          <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+          <div className="col-span-12 lg:col-span-9 flex flex-col gap-6">
             <div className="grid grid-rows-1 md:grid-rows-2 gap-6">
               <Encoding
                 encodingHandler={encodingHandler}
@@ -125,9 +97,7 @@ const EncodingTransform = function () {
               <Transforming
                 datasetId={datasetId}
                 selectedColumns={Object.keys(info.columns)}
-                refresh={() => {
-                  setRefresh(!refresh);
-                }}
+                refresh={refreshHandler}
               ></Transforming>
             </div>
           </div>

@@ -43,7 +43,7 @@ const RawDataInspector = function ({
       }`}
     >
       <div
-        className={`bg-surface-container-low rounded-xl border border-white/5 overflow-hidden
+        className={`bg-surface-container-low rounded-xl border border-white/5 overflow-y-hidden overflow-x-scroll
     ${expand ? "w-[90vw] h-[90vh] shadow-2xl" : "h-100"}
   `}
       >
@@ -67,7 +67,9 @@ const RawDataInspector = function ({
         </div>
         <div
           className={`overflow-auto custom-scrollbar ${
-            expand ? "h-[calc(90vh-80px)]" : "h-100 overflow-hidden"
+            expand
+              ? "h-[calc(90vh-80px)]"
+              : "overflow-y-hidden overflow-x-scroll"
           }`}
         >
           <table className="w-full text-left border-collapse">

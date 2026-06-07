@@ -27,7 +27,7 @@ export default function Home() {
   });
   return (
     <>
-      <main className="grow bg-surface-dim p-8 overflow-y-auto">
+      <div className="grow bg-surface-dim p-8 overflow-y-auto">
         <section className="mb-12">
           <div className="flex items-baseline justify-between mb-6">
             <h1 className="text-2xl font-headline font-extrabold text-white tracking-tight">
@@ -52,7 +52,7 @@ export default function Home() {
           </section>
         </div>
         <SystemStatus></SystemStatus>
-      </main>
+      </div>
     </>
   );
 }

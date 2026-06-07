@@ -1,3 +1,4 @@
+from app.pipeline.schemas import StepType
 from app.pipeline.service import save_pipeline
 from app.dependencies.dataset_action import DatasetContext
 from app.dependencies.dataset_action import get_dataset
@@ -32,7 +33,7 @@ def transform_data(
         df = transformation.normalize(df, req.columns)
     else:
         raise ValueError("Unsupported transformation method")
-    context.steps.append(req)
+    context.steps.append(StepType(type="transform", data=req))
     save_pipeline(context.dataset_id, context.steps)
 
     return True
