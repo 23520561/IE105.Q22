@@ -11,6 +11,7 @@ from app.feature_transformation import router as Transformation
 from app.feature_engineering import router as FeatureEngineer
 from app.feature_imbalance import router as Imbalanced
 from app.pipeline import router as Pipeline
+from app.decision_tree import router as DecisionTree
 
 app = FastAPI()
 app.include_router(eda.router)
@@ -23,6 +24,7 @@ app.include_router(Transformation.router)
 app.include_router(Imbalanced.router)
 app.include_router(FeatureEngineer.router)
 app.include_router(Pipeline.router)
+app.include_router(DecisionTree.router)
 
 
 app.add_middleware(

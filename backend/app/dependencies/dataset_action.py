@@ -31,7 +31,6 @@ def get_dataset(dataset_id: str = Query(...)):
         df["target"] = data.target
         steps = load_pipeline(dataset_id)
         df = apply_pipeline(df, steps)
-        print(df.shape)
         return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
 
     elif dataset_id == "wine":
