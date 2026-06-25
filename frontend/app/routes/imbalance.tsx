@@ -17,7 +17,7 @@ const Imbalance = function () {
   const datasetId = useParams()?.datasetId ?? "";
   const { info, chooseFeatureHandler } = useDataset(datasetId);
   const { pipeline, refreshHandler, deleteHandler } = usePipeline(datasetId);
-  const [method, setMethod] = useState<ImbalancedMethod>();
+  const [method, setMethod] = useState<ImbalancedMethod>("smote");
   const typeList = createTypeList(info.columns);
   const selectedColumn =
     Object.keys(info.columns).find(
@@ -78,7 +78,10 @@ const Imbalance = function () {
 
               {/* RIGHT */}
               <div className="space-y-3">
-                <MethodOptions methodChangeHandler={methodChangeHandler} />
+                <MethodOptions
+                  method={method}
+                  methodChangeHandler={methodChangeHandler}
+                />
               </div>
 
               {/* BUTTON spans both */}

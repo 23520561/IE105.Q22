@@ -6,4 +6,5 @@ export default [
   route("encode&transform/:datasetId", "routes/encodingTransform.tsx"),
   route("feature-engineer/:datasetId", "routes/featureEngineer.tsx"),
   route("imbalance/:datasetId", "routes/imbalance.tsx"),
+  route("model-training/:datasetId", "routes/modelTraining.tsx"),
 ] satisfies RouteConfig;

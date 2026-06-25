@@ -1,3 +1,4 @@
+import math
 from typing import TypedDict
 from typing import Literal
 from typing import Deque
@@ -85,8 +86,7 @@ class Tree:
             data, target, feature_names
         )
         if gini == 0:
-            print("this can't be split")
-            return LeafNode(samples, dist, dataset)
+            raise ValueError("This can't be split")
         mask = data[:, feature_id] <= threshold
         left_data = dataset[mask]
         right_data = dataset[~mask]
@@ -116,9 +116,9 @@ class Tree:
         return parent
 
     def grow_leaf_by_id(self, id):
-        node = self.nodes_lookup[id]
+        node = self.nodes_lookup.get(id)
         if node is None:
-            raise ValueError("Node not found")
+            raise ValueError("Node not found", self.nodes_lookup)
 
         if not node.parent:
             raise ValueError("Not a leaf node")
@@ -142,7 +142,7 @@ class Tree:
             ]
         ] = deque()
         if id not in self.nodes_lookup:
-            raise KeyError(f"Node not found: {id}")
+            raise KeyError(f"Node not found: {id}, nodes_lookup: {self.nodes_lookup}")
 
         root = self.nodes_lookup[id]
         queue.append((root, str(getattr(root, "parent", None)), None, 0))
@@ -168,8 +168,8 @@ class Tree:
                 base.update(
                     {
                         "type": "split",
-                        "title": f"{node.feature} <= {node.threshold}",
-                        "gini": node.gini,
+                        "title": f"{node.feature} <= {math.ceil(node.threshold * 100) / 100}",
+                        "gini": math.ceil(node.gini * 100) / 100,
                     }
                 )
 
@@ -183,6 +183,7 @@ class Tree:
                     {
                         "type": "leaf",
                         "title": "leaf",
+                        "gini": math.ceil(self.gini(node.dist) * 100) / 100,
                     }
                 )
 

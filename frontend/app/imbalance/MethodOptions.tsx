@@ -1,8 +1,10 @@
 import { ImbalancedInfo, type ImbalancedMethod } from "./api";
 
 const MethodOptions = function ({
+  method,
   methodChangeHandler,
 }: {
+  method: ImbalancedMethod;
   methodChangeHandler: (method: ImbalancedMethod) => void;
 }) {
   return (
@@ -18,6 +20,7 @@ const MethodOptions = function ({
               className="hidden peer"
               name="method"
               type="radio"
+              checked={imbalance.method == method}
             />
             <div className="flex flex-col p-4 rounded-xl border border-outline-variant bg-surface-container-low peer-checked:bg-surface-container-highest peer-checked:border-primary transition-all group-hover:bg-surface-bright/20">
               <div className="flex items-center justify-between mb-1">
