@@ -26,7 +26,6 @@ const KdeChart = function ({
   useEffect(() => {
     const chartStyle = initChartStyle();
     const chart = echarts.init(chartRef.current);
-    console.log(kdeChart.points);
 
     const option = {
       grid: [{ top: 20, left: 0, right: 0 }],

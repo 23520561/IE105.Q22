@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router";
+import HeaderPreprocessing from "~/components/HeaderPreprocessing";
 import { useDataset } from "~/customHooks/useDataset";
 import { usePipeline } from "~/customHooks/usePipeline";
 import { createTypeList } from "~/eda/charts/helper";
@@ -38,16 +39,13 @@ const Imbalance = function () {
 
   return (
     <main className=" flex-1 p-8 min-h-screen bg-surface-dim">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-black text-white font-headline tracking-tight">
-            Handling Imbalanced Data
-          </h1>
-          <p className="text-on-surface-variant max-w-2xl">
-            Refine your dataset distribution to ensure minor classes are
-            accurately represented during model training.
-          </p>
-        </div>
+      <div className=" space-y-8">
+        <HeaderPreprocessing
+          title="Handling Imbalanced Data"
+          desc="Refine your dataset distribution to ensure minor classes are accurately represented during model training."
+          nextStep={`/model-training/${datasetId}`}
+          stepNumber={3}
+        ></HeaderPreprocessing>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-4">

@@ -42,7 +42,28 @@ def get_dataset(dataset_id: str = Query(...)):
         steps = load_pipeline(dataset_id)
         df = apply_pipeline(df, steps)
         return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
+    elif dataset_id == "breast":
+        from sklearn.datasets import load_breast_cancer
 
+        data: Bunch = cast(Bunch, load_breast_cancer())
+        df = pd.DataFrame(data.data, columns=data.feature_names)
+        df["target"] = data.target
+        steps = load_pipeline(dataset_id)
+        df = apply_pipeline(df, steps)
+        return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
+
+    UPLOAD_DIR = (BASE_DIR / "../../storage").resolve()
+    csv_path = UPLOAD_DIR / f"{dataset_id}.csv"
+
+    if csv_path.exists():
+        df = pd.read_csv(csv_path)
+        steps = load_pipeline(dataset_id)
+        df = apply_pipeline(df, steps)
+        return DatasetContext(
+            dataset_id=dataset_id,
+            df=df,
+            steps=steps,
+        )
     else:
         raise HTTPException(status_code=404, detail="Dataset not found")
 

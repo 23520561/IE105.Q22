@@ -3,7 +3,9 @@ import { formatSize } from "./helper";
 
 const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
   const [fileList, setFileList] = useState<File[]>([]);
+  const [error, setError] = useState("");
   const [progressList, setProgressList] = useState<number[]>([]);
+  const MAXFILESIZE = 50;
   useEffect(() => {
     // Prevent if drag is file
     window.addEventListener("drop", (e: DragEvent) => {
@@ -29,7 +31,13 @@ const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
     const fileItems = [...e.dataTransfer.files];
     if (fileItems.length > 0) {
       e.preventDefault();
-      if (fileItems.some((item) => item.name.endsWith(".csv"))) {
+      if (
+        fileItems.some(
+          (item) =>
+            item.name.endsWith(".csv") &&
+            fileItems.some((item) => item.size <= MAXFILESIZE * 1024 * 1024),
+        )
+      ) {
         e.dataTransfer.dropEffect = "copy";
       } else {
         e.dataTransfer.dropEffect = "none";
@@ -70,6 +78,10 @@ const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
         }
 
         readNextChunk();
+      }
+      if (data.type === "error") {
+        setProgressList([]);
+        setError(data.message);
       }
       if (data.type === "progress") {
         setProgressList([data.uploaded_bytes]);
@@ -199,6 +211,11 @@ const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
                           {formatSize(file.size)}
                         </p>
                       )}
+                      {error !== "" && (
+                        <p className="text-sm font-medium text-error">
+                          {error}
+                        </p>
+                      )}
                     </div>
                     <button className="text-on-surface-variant hover:text-green-200 transition-colors p-1 opacity-0 group-hover:opacity-100">
                       <span
@@ -240,7 +257,7 @@ const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
                 <span className="material-symbols-outlined text-sm">
                   storage
                 </span>{" "}
-                1.0 GB Max
+                50 MB Max
               </span>
             </div>
             <div className="flex items-center gap-3">

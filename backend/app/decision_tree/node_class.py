@@ -19,6 +19,7 @@ class SplitNode(TreeNode):
         feature,
         threshold,
         gini,
+        gini_history,
         left,
         right,
     ):
@@ -27,6 +28,7 @@ class SplitNode(TreeNode):
         self.feature = feature
         self.threshold = threshold
         self.gini = gini
+        self.gini_history = gini_history
 
         self.left = left
         self.right = right

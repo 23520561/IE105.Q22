@@ -17,6 +17,7 @@ class NodeDict(TypedDict):
     type: Literal["leaf", "split"]
     title: str
     gini: float | None
+    gini_history: dict[str, float]
 
 
 class Tree:
@@ -44,7 +45,7 @@ class Tree:
         checkpoints = np.where(sorted_feature_data[:-1] != sorted_feature_data[1:])[0]
         left_y = np.zeros(len(classes))
         right_y = counts
-        best_threshold = None
+        best_threshold = 0
         i = 0
         best_gini = 1
         for checkpoint in checkpoints:
@@ -68,21 +69,27 @@ class Tree:
         best_threshold = 0
         feature_plit = None
         best_gini = 1
+        gini_history = {}
         for feature_id in range(len(feature_names)):
             feature_data = X[:, feature_id]
             tmp_gini, tmp_threshold = self.find_gini_for_feature(feature_data, y)
+            gini_history[
+                (
+                    f"{feature_names[feature_id]} <= {math.ceil(tmp_threshold * 100) / 100}"
+                )
+            ] = math.ceil(tmp_gini * 100) / 100
             if tmp_gini <= best_gini:
                 feature_plit = feature_id
                 best_gini = tmp_gini
                 best_threshold = tmp_threshold
-        return feature_plit, best_threshold, best_gini
+        return feature_plit, best_threshold, best_gini, gini_history
 
     def build_new_node(self, dataset, feature_names):
         data = dataset[:, :-1]
         target = dataset[:, -1]
         samples = len(dataset)
         dist = np.bincount(target.astype(int))
-        feature_id, threshold, gini = self.find_best_feature(
+        feature_id, threshold, gini, gini_history = self.find_best_feature(
             data, target, feature_names
         )
         if gini == 0:
@@ -105,6 +112,7 @@ class Tree:
             feature=feature_names[feature_id],
             threshold=threshold,
             gini=gini,
+            gini_history=gini_history,
             left=left,
             right=right,
         )
@@ -160,6 +168,7 @@ class Tree:
                     node.dist.tolist() if hasattr(node.dist, "tolist") else node.dist
                 ),
                 "gini": 0,
+                "gini_history": {},
                 "title": "ok",
                 "type": "leaf",
             }
@@ -170,6 +179,7 @@ class Tree:
                         "type": "split",
                         "title": f"{node.feature} <= {math.ceil(node.threshold * 100) / 100}",
                         "gini": math.ceil(node.gini * 100) / 100,
+                        "gini_history": node.gini_history,
                     }
                 )
 

@@ -1,4 +1,5 @@
 import { apiUrl, getData } from "~/api";
+import type { uploadedDatasetType } from "~/seed";
 
 export type prebuiltDatasetType = {
   id: string;
@@ -21,4 +22,10 @@ export type serverStatusType = {
 export async function getServerStatus(): Promise<serverStatusType | null> {
   const prefix = "/server/status";
   return await getData<serverStatusType>(apiUrl + prefix);
+}
+export async function getUploadedDatasets(): Promise<
+  uploadedDatasetType[] | null
+> {
+  const prefix = "/dataset/uploaded";
+  return await getData<uploadedDatasetType[]>(apiUrl + prefix);
 }

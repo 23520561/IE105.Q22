@@ -10,7 +10,6 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import NavigationBar from "./components/NavigationBar";
-import SideBar from "./components/SideBar";
 
 export const links: Route.LinksFunction = () => [
   {
@@ -38,10 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-background text-on-surface font-body selection:bg-primary/30">
         <NavigationBar></NavigationBar>
-        <main className="flex min-h-[calc(100vh-3.5rem)]">
-          <SideBar></SideBar>
-          {children}
-        </main>
+        <main className="flex min-h-[calc(100vh-3.5rem)]">{children}</main>
         <ScrollRestoration />
         <Scripts />
       </body>

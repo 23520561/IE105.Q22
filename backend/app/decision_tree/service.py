@@ -22,6 +22,7 @@ def get_tree(data: pd.DataFrame, feature_names: pd.Index) -> list[NodeSchema]:
             type=node["type"],
             title=str(node["title"]),
             gini=node.get("gini"),
+            gini_history=node.get("gini_history"),
         )
         for node in tree.tree_to_js_nodes(tree.root.id)
     ]

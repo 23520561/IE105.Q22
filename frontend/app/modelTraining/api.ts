@@ -6,6 +6,7 @@ interface DecisionTreeInfo {
   x?: number;
   y?: number;
   gini: number;
+  gini_history: Record<string, number>;
   half?: "left" | "right";
   depth: number;
   samples: number;

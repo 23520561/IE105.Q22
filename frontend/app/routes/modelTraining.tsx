@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useDataset } from "~/customHooks/useDataset";
 import {
   addNode,
@@ -11,11 +11,26 @@ import PlayGround from "~/modelTraining/playground";
 
 const modelTraining = function () {
   const datasetId = useParams()?.datasetId ?? "";
-  const { info, chooseFeatureHandler } = useDataset(datasetId);
+  const { info } = useDataset(datasetId);
+  const navigate = useNavigate();
   const [visualNodes, setVisualNodes] = useState<
     DecisionTreeNodeVisualization[]
   >([]);
   const selectedNode = visualNodes.find((n) => n.selected) || null;
+  const { depth } = visualNodes.reduceRight(
+    (s, n, i) => {
+      if (i === visualNodes.length - 1) {
+        s.p = n.parent || "";
+      } else if (s.p === n.id) {
+        if (i !== 0) {
+          s.p = n.parent || "";
+        }
+        s.depth++;
+      }
+      return s;
+    },
+    { depth: 0, p: "" },
+  );
   const NodeWidth = 180,
     NodeHeight = 100;
   function setSelectedNode(nodeId: string | null) {
@@ -56,7 +71,6 @@ const modelTraining = function () {
   useEffect(() => {
     const fetchData = async () => {
       const nodes = await getTree(datasetId);
-      console.log(nodes);
       if (!nodes) {
         return;
       }
@@ -75,16 +89,25 @@ const modelTraining = function () {
     <div className="flex-1 relative overflow-hidden canvas-bg bg-surface-dim">
       <div className="absolute top-6 left-6 z-10 flex items-center gap-4">
         <div className="bg-surface-container-high px-4 py-2 rounded-xl flex items-center gap-3 border border-outline-variant/10 shadow-lg">
+          <button
+            className="p-2 hover:bg-surface-variant/40 rounded-full transition-colors"
+            onClick={() => navigate(-1)}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant">
+              arrow_back
+            </span>
+          </button>
+
           <h1 className="font-headline font-bold text-lg text-on-surface">
             Decision Tree Explorer
           </h1>
           <div className="h-4 w-px bg-outline-variant/30"></div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-on-surface-variant font-medium">
-              Depth: 4
+              Depth: {depth}
             </span>
             <span className="text-xs text-on-surface-variant font-medium">
-              Nodes: 15
+              Nodes: {visualNodes.length}
             </span>
           </div>
         </div>

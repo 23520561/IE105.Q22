@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { data, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useDataset } from "~/customHooks/useDataset";
 import EdaCarousel from "~/eda/EdaCarousel";
 import ColumnOps from "~/FeatEngin/ColumnOps";
@@ -9,6 +9,7 @@ import OperationsList from "~/FeatEngin/OperationsList";
 import GroupBy from "~/FeatEngin/GroupBy";
 import { PipelineList } from "~/pipeline/PipelineList";
 import { usePipeline } from "~/customHooks/usePipeline";
+import HeaderPreprocessing from "~/components/HeaderPreprocessing";
 
 const FeatureEngineer = function () {
   const datasetId = useParams()?.datasetId ?? "";
@@ -22,16 +23,12 @@ const FeatureEngineer = function () {
   return (
     <main className="flex h-screen overflow-hidden">
       <section className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-surface-dim">
-        <header className="mb-10">
-          <h1 className="text-3xl font-headline font-extrabold text-white tracking-tight mb-2">
-            Expression Builder
-          </h1>
-          <p className="text-on-surface-variant text-sm max-w-2xl">
-            Design complex feature transformations by combining raw data
-            columns, mathematical operators, and high-fidelity functions.
-          </p>
-        </header>
-
+        <HeaderPreprocessing
+          title="Feature Engineer"
+          desc="Design complex feature transformations by combining raw data columns, mathematical operators, and high-fidelity functions."
+          nextStep={`/imbalance/${datasetId}`}
+          stepNumber={2}
+        ></HeaderPreprocessing>
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-3 space-y-4">
             <OperationsList

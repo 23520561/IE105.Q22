@@ -9,11 +9,11 @@ import {
   enconding,
   type EncodingMethodType,
 } from "~/enTra/api";
-import { type PipelineStepType } from "~/pipeline/PipelineStepType";
 import EdaCarousel from "~/eda/EdaCarousel";
 import { PipelineList } from "~/pipeline/PipelineList";
 import Transforming from "~/enTra/Transforming";
 import { usePipeline } from "~/customHooks/usePipeline";
+import HeaderPreprocessing from "~/components/HeaderPreprocessing";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Encoding and Transform" }];
@@ -46,34 +46,14 @@ const EncodingTransform = function () {
 
   return (
     <>
-      <main className="flex-1 relative overflow-hidden flex flex-col bg-surface-dim">
-        <header className="h-16 flex items-center justify-between px-8 bg-surface-container-low shrink-0">
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-surface-variant/40 rounded-full transition-colors">
-              <span className="material-symbols-outlined text-on-surface-variant">
-                arrow_back
-              </span>
-            </button>
-            <div>
-              <h1 className="font-headline text-lg font-bold text-white leading-tight">
-                Encoding &amp; Transformation
-              </h1>
-              <p className="text-xs text-on-surface-variant font-medium tracking-tight">
-                Step 04 • Preprocessing Pipeline
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button className="px-4 py-1.5 rounded-md border border-outline-variant/20 text-on-surface-variant text-xs font-semibold hover:bg-surface-container-high transition-colors">
-              Discard Changes
-            </button>
-            <button className="px-6 py-1.5 rounded-md bg-primary text-on-primary text-xs font-bold hover:bg-surface-tint transition-colors">
-              Save Config
-            </button>
-          </div>
-        </header>
-
-        <div className="flex-1 p-8 grid grid-cols-12 gap-6 overflow-y-auto custom-scrollbar">
+      <main className="flex-1 relative overflow-hidden flex flex-col bg-surface-dim p-8">
+        <HeaderPreprocessing
+          title="Encoding &amp; Transformation"
+          desc="Transform raw features into robust model inputs with configurable encoding, scaling, normalization, and preprocessing operations."
+          nextStep={`/feature-engineer/${datasetId}`}
+          stepNumber={1}
+        ></HeaderPreprocessing>
+        <div className="flex-1 grid grid-cols-12 gap-6 overflow-y-auto custom-scrollbar">
           <section className="col-span-12 lg:col-span-3 flex flex-col gap-4">
             <FeatureSelection
               typeLists={typeList}

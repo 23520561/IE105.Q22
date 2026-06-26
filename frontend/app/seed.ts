@@ -1,24 +1,24 @@
 import type { prebuiltDatasetType } from "./home/api";
 
-export type uploadedDataset = {
+export type uploadedDatasetType = {
   name: string;
-  dateModdified: string;
+  dateModified: string;
   size: `${number}${"MB" | "GB"}`;
 };
-export const uploadedDataset: uploadedDataset[] = [
+export const uploadedDataset: uploadedDatasetType[] = [
   {
     name: "user_logs_raw.csv",
-    dateModdified: "Nov 11",
+    dateModified: "Nov 11",
     size: "4MB",
   },
   {
     name: "some_templates.csv",
-    dateModdified: "Oct 8",
+    dateModified: "Oct 8",
     size: "5GB",
   },
   {
     name: "Some_other_templates.csv",
-    dateModdified: "Sep 12",
+    dateModified: "Sep 12",
     size: "200MB",
   },
 ];
@@ -36,18 +36,21 @@ export const recentProject: recentProject[] = [
 
 export const prebuiltDataset: prebuiltDatasetType[] = [
   {
+    id: "iris",
     name: "Iris Dataset",
     image: "Deceased",
     description:
       "Containing 150 samples of iris flowers with four features each, used to classify them into three species: setosa, versicolor, and virginica. It’s small, clean, and ideal for beginners learning multiclass classification.",
   },
   {
+    id: "wine",
     name: "Wine Dataset",
     image: "Wine_Bar",
     description:
       "Having 178 samples of wines with 13 chemical features, classified into three cultivars. It’s commonly used to practice feature analysis and multiclass classification models.",
   },
   {
+    id: "breast",
     name: "Breast Cancer Dataset",
     image: "Oncology",
     description:

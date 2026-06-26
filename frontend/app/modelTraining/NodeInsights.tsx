@@ -74,6 +74,35 @@ const NodeInsights = function ({
                 </div>
               </div>
             </div>
+            {node.type === "split" && (
+              <div>
+                <h4 className="text-xs font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm text-primary">
+                    bar_chart
+                  </span>
+                  Feature Gini
+                </h4>
+                <div className="space-y-4">
+                  {Object.keys(node.gini_history).map((val) => (
+                    <div>
+                      <div className="flex justify-between text-xs mb-1.5">
+                        <span className="text-on-surface-variant">{val}</span>
+                        <span className="text-white font-bold" id="dist-a-val">
+                          {node.gini_history[val]}
+                        </span>
+                      </div>
+                      <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+                        <div
+                          className="bg-primary h-full transition-all duration-700"
+                          id="dist-a-bar"
+                          style={{ width: `${node.gini_history[val] * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}{" "}
             <div>
               <h4 className="text-xs font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-sm text-primary">

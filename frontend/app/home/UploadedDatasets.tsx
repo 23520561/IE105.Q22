@@ -1,13 +1,27 @@
 import { uploadedDataset } from "~/seed";
+import type { uploadedDatasetType } from "~/seed";
 import SearchBox from "~/components/SearchBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UploadedModal from "./UploadedModal";
+import { getUploadedDatasets } from "./api";
+import { useNavigate } from "react-router";
+import { formatSize } from "./helper";
 const UploadedDatasets = function () {
   const [modalOpened, setModalOpened] = useState(false);
+  const [uploaded, setUploaded] = useState<uploadedDatasetType[]>([]);
+  const navigate = useNavigate();
   function onClose() {
-    console.log("click");
     setModalOpened(false);
   }
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getUploadedDatasets();
+      if (data) {
+        setUploaded(data);
+      }
+    };
+    fetchData();
+  }, []);
   return (
     <>
       <div className="flex items-center justify-between">
@@ -41,7 +55,42 @@ const UploadedDatasets = function () {
                       {dataset.name}
                     </p>
                     <p className="text-[9px] text-on-surface-variant tabular-nums">
-                      {`${dataset.size} • Modified ${dataset.dateModdified}`}
+                      {`${dataset.size} • Modified ${dataset.dateModified}`}
+                    </p>
+                  </div>
+                </div>
+                <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                  download
+                </span>
+              </div>
+            );
+          })}
+          {uploaded.map((dataset, i) => {
+            const color = ["sky", "green", "slate"][i % 3];
+            return (
+              <div
+                key={i}
+                className="px-4 py-3 flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group"
+                onClick={() =>
+                  navigate(
+                    `encode&transform/${dataset.name.replace(".csv", "")}`,
+                  )
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`material-symbols-outlined text-${color}-400 text-lg`}
+                  >
+                    {dataset.name.includes(".csv")
+                      ? "table_chart"
+                      : "description"}
+                  </span>
+                  <div>
+                    <p className="text-xs font-medium text-on-surface">
+                      {dataset.name}
+                    </p>
+                    <p className="text-[9px] text-on-surface-variant tabular-nums">
+                      {`${formatSize(Number(dataset.size))} • Modified ${dataset.dateModified}`}
                     </p>
                   </div>
                 </div>

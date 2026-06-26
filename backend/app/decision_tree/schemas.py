@@ -16,3 +16,4 @@ class NodeSchema(BaseModel):
     title: str
 
     gini: Optional[float] = None
+    gini_history: dict[str, float]
