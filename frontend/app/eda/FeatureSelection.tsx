@@ -10,7 +10,7 @@ const FeatureSelection = function ({
   chooseHandler: (e: string | undefined) => void;
 }) {
   return (
-    <div className="bg-surface-container rounded-xl p-6 border border-white/5 border-l-amber- h-full flex flex-col">
+    <div className="bg-surface-container rounded-xl p-6 border border-white/5 border-l-amber- h-full flex flex-col max-h-[40vh] overflow-y-auto">
       <h4 className="text-xs font-bold text-white mb-4 flex items-center gap-2">
         <span className="material-symbols-outlined text-sm">tune</span> Feature
         Selection
