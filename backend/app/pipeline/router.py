@@ -8,7 +8,7 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/pipeline", tags=["pipeline"])
 
 
-@router.get("/")
+@router.get("")
 def get_pipeline(context: DatasetContext = Depends(get_dataset)):
     return context.steps
 
