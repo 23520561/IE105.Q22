@@ -11,14 +11,18 @@ class FilterRequest(BaseModel):
 
 
 class RfeRequest(BaseModel):
-    data: list[dict]
-    target: str
     n_features: int = 10
 
 
+class RfeResponse(BaseModel):
+    recommended_to_keep: list[str]
+    feature_ranking: dict[str, int]
+    n_features_kept: int
+    estimator_used: str
+    feature_importances: dict[str, float]
+
+
 class BackwardRequest(BaseModel):
-    data: list[dict]
-    target: str
     min_features: int = 10
 
 

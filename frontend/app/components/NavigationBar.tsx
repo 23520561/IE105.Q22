@@ -2,9 +2,16 @@ const NavigationBar = function () {
   return (
     <header className="bg-[#0b1326] flex justify-between items-center px-6 h-14 w-full z-50 docked full-width top-0 sticky">
       <div className="flex items-center gap-8">
-        <span className="text-lg font-extrabold text-white tracking-tighter font-headline">
-          The Observational Engine
-        </span>
+        <div className="flex gap-2 items-center p-4">
+          <img
+            src="/android-chrome-192x192.png"
+            alt="The Observational Engine logo"
+            className="h-10 w-10"
+          />
+          <span className="text-lg font-extrabold text-white tracking-tighter font-headline">
+            The Observational Engine
+          </span>
+        </div>
         <nav className="hidden md:flex gap-6 items-center h-full">
           <a
             className="font-['Manrope'] font-bold text-sm tracking-tight text-slate-400 hover:text-white transition-colors"

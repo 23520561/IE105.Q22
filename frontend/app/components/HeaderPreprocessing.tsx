@@ -37,7 +37,7 @@ const HeaderPreprocessing = function ({
       </div>
       <div className="flex gap-3">
         <button
-          className="p-6 rounded-md bg-primary text-on-primary text-xs font-bold hover:bg-surface-tint transition-colors"
+          className="p-6 rounded-md bg-primary text-on-primary text-xs font-bold hover:scale-95 transition-colors"
           onClick={() => navigate(nextStep)}
         >
           Next Step
