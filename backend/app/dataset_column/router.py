@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=ColumnInfoResponse)
+@router.get("", response_model=ColumnInfoResponse)
 async def get_columns(
     context: DatasetContext = Depends(get_dataset),
 ):
