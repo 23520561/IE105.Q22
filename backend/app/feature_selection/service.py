@@ -1,3 +1,5 @@
+from sklearn.tree._classes import DecisionTreeClassifier
+from app.feature_selection.schemas import RfeResponse
 from collections import Counter
 from typing import cast
 
@@ -117,7 +119,7 @@ def analyze_features(
 def recommend_features_rfe(X, y, target_n_features=10, step_size=1, estimator=None):
 
     if estimator is None:
-        estimator = LogisticRegression(max_iter=1000, random_state=42)
+        estimator = DecisionTreeClassifier(random_state=42)
 
     selector = RFE(
         estimator=estimator,
@@ -127,13 +129,17 @@ def recommend_features_rfe(X, y, target_n_features=10, step_size=1, estimator=No
     )
 
     selector.fit(X, y)
+    recommended = X.columns[selector.support_].tolist()
 
-    return {
-        "recommended_to_keep": X.columns[selector.support_].tolist(),
-        "feature_ranking": dict(zip(X.columns, selector.ranking_)),
-        "n_features_kept": target_n_features,
-        "estimator_used": estimator.__class__.__name__,
-    }
+    return RfeResponse(
+        recommended_to_keep=recommended,
+        feature_ranking=dict(zip(X.columns, selector.ranking_)),
+        n_features_kept=target_n_features,
+        estimator_used=estimator.__class__.__name__,
+        feature_importances=dict(
+            zip(recommended, selector.estimator_.feature_importances_)
+        ),
+    )
 
 
 def recommend_features_backward_elimination(

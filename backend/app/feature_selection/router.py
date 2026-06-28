@@ -1,6 +1,5 @@
 from app.dependencies.dataset_action import get_dataset
 from app.dependencies.dataset_action import DatasetContext
-import pandas as pd
 from fastapi import APIRouter, Depends
 
 from .schemas import (
@@ -32,9 +31,8 @@ def filter_features(
 @router.post("/rfe")
 def rfe_features(req: RfeRequest, context: DatasetContext = Depends(get_dataset)):
     df = context.df
-    df = pd.DataFrame(req.data)
-    X = df.drop(columns=[req.target])
-    y = df[req.target]
+    X = df.iloc[:, :-1]
+    y = df.iloc[:, -1]
     result = recommend_features_rfe(X, y, target_n_features=req.n_features)
     return result
 
@@ -44,9 +42,8 @@ def backward_features(
     req: BackwardRequest, context: DatasetContext = Depends(get_dataset)
 ):
     df = context.df
-    df = pd.DataFrame(req.data)
-    X = df.drop(columns=[req.target])
-    y = df[req.target]
+    X = df.iloc[:, :-1]
+    y = df.iloc[:, -1]
     result = recommend_features_backward_elimination(
         X, y, min_features_to_keep=req.min_features
     )
@@ -59,4 +56,3 @@ def reduce_dimension(
 ) -> ReductionResponse:
     df = context.df
     return get_reduce_dimension(df, method=req.method)
-

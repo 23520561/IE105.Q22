@@ -7,4 +7,5 @@ export default [
   route("feature-engineer/:datasetId", "routes/featureEngineer.tsx"),
   route("imbalance/:datasetId", "routes/imbalance.tsx"),
   route("model-training/:datasetId", "routes/modelTraining.tsx"),
+  route("feature-selection/:datasetId", "routes/featureSelection.tsx"),
 ] satisfies RouteConfig;
