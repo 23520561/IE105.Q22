@@ -43,7 +43,10 @@ def get(
             - "shape": Tuple representing the shape of the DataFrame (rows, columns).
     """
     # Get the columns as a list
-    columnsInfo: Dict[Hashable, Dict[Hashable, Any]] = df.describe().to_dict("index")
+    columnsInfo: Dict[Hashable, Dict[Hashable, Any]] = df.describe().T.to_dict("index")
+    dtypes = df.dtypes.astype(str)
+    for col in columnsInfo:
+        columnsInfo[col]["type"] = dtypes[str(col)]
     # Get the first 5 rows (head) of the DataFrame
     rows = df.head().to_dict(orient="records")  # Convert to a list of dictionaries
     head = RowsResponse(rows=rows, count=len(rows))

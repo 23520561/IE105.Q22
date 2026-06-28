@@ -1,16 +1,22 @@
-import pandas as pd
+from app.pipeline.schemas import StepType
+from app.pipeline.service import save_pipeline
+from app.dependencies.dataset_action import get_dataset
+from fastapi import Depends
+from app.dependencies.dataset_action import DatasetContext
 from fastapi import APIRouter
-from services import sp_ops
+from app.feature_engineering.services import sp_ops
 
 from .schemas import FeatureEngRequest
 from .services.exp_eval import ExpressionEvaluator
 
-router = APIRouter(prefix="/feature-engineering", tags=["Feature Engineering"])
+router = APIRouter(prefix="/features/engineering", tags=["Feature Engineering"])
 
 
 @router.post("/")
-def engineer_feature(req: FeatureEngRequest):
-    df = pd.DataFrame(req.data)
+def engineer_feature(
+    req: FeatureEngRequest, context: DatasetContext = Depends(get_dataset)
+):
+    df = context.df
     op = req.operation
     if op == "extract_datetime":
         sp_ops.extract_datetime(df, req.column)
@@ -34,8 +40,9 @@ def engineer_feature(req: FeatureEngRequest):
         # Use exp_eval for expression-based feature creation
         expression = req.params.get("expression", "")
         new_col = req.new_col or "new_feature"
-        result = ExpressionEvaluator().exp_compiler(df, expression, new_col)
-        df[new_col] = result
+        ExpressionEvaluator().exp_compiler(df, expression, new_col)
     else:
         raise ValueError("Unsupported operation")
-    return {"data": df.to_dict("records")}
+    context.steps.append(StepType(type="engineer", data=req))
+    save_pipeline(context.dataset_id, context.steps)
+    return True

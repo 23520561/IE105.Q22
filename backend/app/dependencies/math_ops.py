@@ -6,12 +6,9 @@ import numpy as np
 # Original parameter signatures preserved
 # =============================================================
 
-def _to_series(x) -> pd.Series:
-    """Convert input to pandas Series. Always returns Series."""
-    if isinstance(x, pd.Series):
-        return x
-    # scalar or numpy array -> Series
-    return pd.Series(x, dtype='float64')
+
+def _to_series(x):
+    return x
 
 
 # -----------------------
@@ -56,12 +53,12 @@ def power(a: pd.Series | float, b: pd.Series | float) -> pd.Series:
 def log(a: pd.Series | float, base: pd.Series | float) -> pd.Series:
     a_s = _to_series(a)
     base_s = _to_series(base)
-    
+
     condition = (a_s > 0) & (base_s > 0) & (base_s != 1)
-    
+
     ln_a = np.log(a_s)
     ln_base = np.log(base_s)
-    
+
     return (ln_a / ln_base).where(condition, np.nan)
 
 
@@ -71,41 +68,41 @@ def log(a: pd.Series | float, base: pd.Series | float) -> pd.Series:
 def sin(x: pd.Series | float, deg: int = 0) -> pd.Series:
     if deg not in [0, 1]:
         raise ValueError("deg must be 0 or 1")
-    
+
     x_s = _to_series(x)
     if deg == 1:
         x_s = np.deg2rad(x_s)
-    return pd.Series(np.sin(x_s), dtype='float64')
+    return pd.Series(np.sin(x_s), dtype="float64")
 
 
 def cos(x: pd.Series | float, deg: int = 0) -> pd.Series:
     if deg not in [0, 1]:
         raise ValueError("deg must be 0 or 1")
-    
+
     x_s = _to_series(x)
     if deg == 1:
         x_s = np.deg2rad(x_s)
-    return pd.Series(np.cos(x_s), dtype='float64')
+    return pd.Series(np.cos(x_s), dtype="float64")
 
 
 def tan(x: pd.Series | float, deg: int = 0) -> pd.Series:
     if deg not in [0, 1]:
         raise ValueError("deg must be 0 or 1")
-    
+
     x_s = _to_series(x)
     if deg == 1:
         x_s = np.deg2rad(x_s)
-    return pd.Series(np.tan(x_s), dtype='float64')
+    return pd.Series(np.tan(x_s), dtype="float64")
 
 
 def cot(x: pd.Series | float, deg: int = 0) -> pd.Series:
     if deg not in [0, 1]:
         raise ValueError("deg must be 0 or 1")
-    
+
     x_s = _to_series(x)
     if deg == 1:
         x_s = np.deg2rad(x_s)
-    
+
     t = np.tan(x_s)
     result = 1.0 / t
-    return pd.Series(result, dtype='float64').where(t != 0, np.nan)
+    return pd.Series(result, dtype="float64").where(t != 0, np.nan)

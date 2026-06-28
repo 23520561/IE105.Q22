@@ -4,12 +4,12 @@ from pydantic import BaseModel, Field
 
 
 class RowsResponse(BaseModel):
-    rows: List[Dict[Hashable, Any]]
+    rows: List[List[float | str]]
     count: int
 
 
 class PagingParams(BaseModel):
-    limit: int = Field(10, ge=1, le=25, description="Number of rows to return")
+    limit: int = Field(1, ge=1, le=25, description="Number of rows to return")
     offset: int = Field(0, ge=0, description="Number of rows to skip")
 
 
@@ -19,34 +19,5 @@ class ColumnInfoResponse(BaseModel):
     shape: Tuple[int, int]
 
 
-class HistogramResponse(BaseModel):
-    column: str
-    bins: int
-    histogram: List[Dict[str, int | float]]
-
-
-class BoxPlotResponse(BaseModel):
-    column: str
-    min: float | int
-    q1: float | int
-    median: float | int
-    q3: float | int
-    max: float | int
-    outliers: List[float | int]
-    lower_bound: float | int
-    upper_bound: float | int
-
-
-class PCAResponse(BaseModel):
-    points: List[Dict[str, float]]
-    explained_variance: List[float]
-    total_variance: float
-
-
 class KDEResponse(BaseModel):
     points: List[Dict[str, float]]
-
-
-class HeatmapResponse(BaseModel):
-    labels: List[str]
-    matrix: list[list[float]]

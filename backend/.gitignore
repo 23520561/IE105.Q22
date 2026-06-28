@@ -1,3 +1,4 @@
 pyrefly.toml
 poetry.lock
 __pycache__/
+cached/*

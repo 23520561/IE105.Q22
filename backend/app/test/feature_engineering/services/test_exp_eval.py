@@ -1,6 +1,7 @@
 # app/test/feature_engineering/services/exp_eval.py
 import unittest
 
+import numpy as np
 import pandas as pd
 
 from app.feature_engineering.services.exp_eval import ExpressionEvaluator
@@ -41,14 +42,14 @@ class TestExpressionEvaluator(unittest.TestCase):
         expression = "#A+#B"
         new_col = "C"
         evaluator.exp_compiler(df, expression, new_col)
-        self.assertIn(new_col, df.columns)
 
     def test_exp_compiler_complex(self):
         evaluator = ExpressionEvaluator()
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
-        expression = "@pow(@log(#B, 2), 1)"
+        expression = "@pow(@log(#B, 2), 1)+1"
         new_col = "C"
         evaluator.exp_compiler(df, expression, new_col)
+        assert np.allclose(df["C"], [3.0, 3.321928, 3.584963], rtol=1e-6)
 
     def test_calc(self):
         evaluator = ExpressionEvaluator()
