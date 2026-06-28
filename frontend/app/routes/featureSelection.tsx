@@ -67,7 +67,7 @@ const FeatureEngineer = function () {
                     type="number"
                     min={0}
                     max={info.shape[1] - 1}
-                    value={0}
+                    value={req.numberFeature}
                     onChange={(e) =>
                       setReq(new RfeRequest(Number(e.target.value)))
                     }
