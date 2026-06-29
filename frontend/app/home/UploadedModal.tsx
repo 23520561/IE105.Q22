@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { formatSize } from "./helper";
 
-const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
+const UploadedModal = function ({
+  onClose,
+  setRefresh,
+}: {
+  onClose: VoidFunction;
+  setRefresh: VoidFunction;
+}) {
   const [fileList, setFileList] = useState<File[]>([]);
   const [error, setError] = useState("");
   const [progressList, setProgressList] = useState<number[]>([]);
@@ -84,6 +90,9 @@ const UploadedModal = function ({ onClose }: { onClose: VoidFunction }) {
         setError(data.message);
       }
       if (data.type === "progress") {
+        if (data.uploaded_bytes === file.size) {
+          setRefresh();
+        }
         setProgressList([data.uploaded_bytes]);
       }
     };

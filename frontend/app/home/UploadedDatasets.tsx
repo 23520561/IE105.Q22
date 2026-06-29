@@ -9,7 +9,11 @@ import { formatSize } from "./helper";
 const UploadedDatasets = function () {
   const [modalOpened, setModalOpened] = useState(false);
   const [uploaded, setUploaded] = useState<uploadedDatasetType[]>([]);
+  const [refresh, setRefresh] = useState(false);
   const navigate = useNavigate();
+  function refreshHandler() {
+    setRefresh(!refresh);
+  }
   function onClose() {
     setModalOpened(false);
   }
@@ -21,7 +25,7 @@ const UploadedDatasets = function () {
       }
     };
     fetchData();
-  }, []);
+  }, [refresh]);
   return (
     <>
       <div className="flex items-center justify-between">
@@ -116,7 +120,12 @@ const UploadedDatasets = function () {
             </span>
           </div>
         </div>
-        {modalOpened && <UploadedModal onClose={onClose}></UploadedModal>}{" "}
+        {modalOpened && (
+          <UploadedModal
+            onClose={onClose}
+            setRefresh={refreshHandler}
+          ></UploadedModal>
+        )}{" "}
       </div>
     </>
   );

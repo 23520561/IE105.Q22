@@ -21,7 +21,7 @@ const BaseExpression = function ({
     right: columns[1] || columns[0] || "",
   });
   useEffect(() => {
-    setBaseExpr(`#${expr.left} ${expr.op} #${expr.right}`);
+    setBaseExpr(`[${expr.left}]${expr.op}[${expr.right}]`);
   }, [expr]);
   return (
     <>

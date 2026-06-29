@@ -36,7 +36,7 @@ const CustomExpressionBuilder = function ({
     let s = expr.baseExpr;
     for (let i = 0; i < expr.wrapFunctions.length; i++) {
       const fn = expr.wrapFunctions[i];
-      s = `@${fn.type}( ${s}, ${fn.param})`;
+      s = `@${fn.type}(${s},${fn.param})`;
     }
     return s;
   }
