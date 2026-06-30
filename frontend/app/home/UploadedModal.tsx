@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatSize } from "./helper";
+import { websocketUrl } from "~/api";
 
 const UploadedModal = function ({
   onClose,
@@ -51,7 +52,7 @@ const UploadedModal = function ({
     }
   }
   function uploadHandler(file: File) {
-    const ws = new WebSocket("ws://localhost:8000/dataset/upload");
+    const ws = new WebSocket(`${websocketUrl}/dataset/upload`);
 
     ws.onopen = () => {
       ws.send(file.name);

@@ -1,6 +1,7 @@
 import type { PipelineStepType } from "./pipeline/PipelineStepType";
 
-export const apiUrl = import.meta.env.VITE_API_URL;
+export const apiUrl: string = import.meta.env.VITE_API_URL;
+export const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
 export async function getData<T>(url: string): Promise<T | null> {
   try {
     const response = await fetch(url, {
