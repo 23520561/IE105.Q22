@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.dataset_eda import router as eda
@@ -27,6 +27,14 @@ app.include_router(Imbalanced.router)
 app.include_router(FeatureEngineer.router)
 app.include_router(Pipeline.router)
 app.include_router(DecisionTree.router)
+
+
+@app.middleware("http")
+async def security_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 app.add_middleware(
