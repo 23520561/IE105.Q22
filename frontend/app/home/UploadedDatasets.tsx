@@ -3,7 +3,7 @@ import type { uploadedDatasetType } from "~/seed";
 import SearchBox from "~/components/SearchBox";
 import { useEffect, useState } from "react";
 import UploadedModal from "./UploadedModal";
-import { getUploadedDatasets } from "./api";
+import { deleteUploadedDatasets, getUploadedDatasets } from "./api";
 import { useNavigate } from "react-router";
 import { formatSize } from "./helper";
 const UploadedDatasets = function () {
@@ -98,9 +98,17 @@ const UploadedDatasets = function () {
                     </p>
                   </div>
                 </div>
-                <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                  download
-                </span>
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    await deleteUploadedDatasets(dataset.name);
+                    refreshHandler();
+                  }}
+                >
+                  <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 group-hover:text-error transition-opacity">
+                    delete
+                  </span>
+                </button>
               </div>
             );
           })}

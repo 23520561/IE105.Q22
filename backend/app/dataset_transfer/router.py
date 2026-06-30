@@ -1,10 +1,10 @@
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, Query, WebSocket
 
 from app.dataset_transfer.service import (
-    save_chunk,
-    validate_file,
     delete_file,
     get_uploaded_dataset,
+    save_chunk,
+    validate_file,
 )
 
 router = APIRouter(
@@ -17,6 +17,11 @@ router = APIRouter(
 @router.get("/uploaded")
 def get_uploaded():
     return get_uploaded_dataset()
+
+
+@router.delete("/uploaded")
+async def delete_uploaded(file_id=Query(...)):
+    return await delete_file(file_id)
 
 
 @router.websocket("/upload")

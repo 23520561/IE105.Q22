@@ -1,4 +1,4 @@
-import { apiUrl, getData } from "~/api";
+import { apiUrl, deleteData, getData } from "~/api";
 import type { uploadedDatasetType } from "~/seed";
 
 export type prebuiltDatasetType = {
@@ -28,4 +28,8 @@ export async function getUploadedDatasets(): Promise<
 > {
   const prefix = "/dataset/uploaded";
   return await getData<uploadedDatasetType[]>(apiUrl + prefix);
+}
+export async function deleteUploadedDatasets(fileId: string) {
+  const prefix = `/dataset/uploaded?file_id=${fileId}`;
+  return await deleteData(apiUrl + prefix);
 }
