@@ -1,3 +1,5 @@
+from app.dataset_transfer.service import save_file
+import json
 from fastapi import APIRouter, Query, WebSocket
 
 from app.dataset_transfer.service import (
@@ -15,8 +17,8 @@ router = APIRouter(
 
 
 @router.get("/uploaded")
-def get_uploaded():
-    return get_uploaded_dataset()
+def get_uploaded(wp_id=Query(...)):
+    return get_uploaded_dataset(wp_id)
 
 
 @router.delete("/uploaded")
@@ -28,7 +30,13 @@ async def delete_uploaded(file_id=Query(...)):
 async def upload_dataset(ws: WebSocket):
     await ws.accept()
     MAX_SIZE = 50 * 1024 * 1024
-    file_name = await ws.receive_text()
+    message = await ws.receive_text()
+    data = json.loads(message)
+    print(data)
+
+    session_id = data["sessionId"]
+    file_name = data["fileName"]
+
     if file_name:
         await ws.send_json({"type": "ready"})
     total_received = 0
@@ -48,6 +56,7 @@ async def upload_dataset(ws: WebSocket):
             return
         await save_chunk(file_name, chunk)
         await ws.send_json({"type": "progress", "uploaded_bytes": total_received})
+    save_file(session_id=session_id, file_name=file_name)
     try:
         await validate_file(file_name)
         await ws.send_json({"type": "success"})

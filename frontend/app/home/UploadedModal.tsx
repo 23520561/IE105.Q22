@@ -5,9 +5,11 @@ import { websocketUrl } from "~/api";
 const UploadedModal = function ({
   onClose,
   setRefresh,
+  workspaceHandler,
 }: {
   onClose: VoidFunction;
   setRefresh: VoidFunction;
+  workspaceHandler: VoidFunction;
 }) {
   const [fileList, setFileList] = useState<File[]>([]);
   const [error, setError] = useState("");
@@ -52,10 +54,16 @@ const UploadedModal = function ({
     }
   }
   function uploadHandler(file: File) {
+    const sessionId = workspaceHandler();
     const ws = new WebSocket(`${websocketUrl}/dataset/upload`);
 
     ws.onopen = () => {
-      ws.send(file.name);
+      ws.send(
+        JSON.stringify({
+          sessionId,
+          fileName: file.name,
+        }),
+      );
     };
 
     ws.onmessage = (event) => {

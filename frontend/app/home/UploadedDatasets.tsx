@@ -6,10 +6,12 @@ import UploadedModal from "./UploadedModal";
 import { deleteUploadedDatasets, getUploadedDatasets } from "./api";
 import { useNavigate } from "react-router";
 import { formatSize } from "./helper";
+import { useSession } from "~/workspaceProvider";
 const UploadedDatasets = function () {
   const [modalOpened, setModalOpened] = useState(false);
   const [uploaded, setUploaded] = useState<uploadedDatasetType[]>([]);
   const [refresh, setRefresh] = useState(false);
+  const { workspace, setWorkspace } = useSession();
   const navigate = useNavigate();
   function refreshHandler() {
     setRefresh(!refresh);
@@ -17,11 +19,21 @@ const UploadedDatasets = function () {
   function onClose() {
     setModalOpened(false);
   }
+  function workspaceHandler() {
+    if (workspace === "") {
+      const id = crypto.randomUUID();
+      setWorkspace(id);
+      return id;
+    }
+    return workspace;
+  }
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getUploadedDatasets();
-      if (data) {
-        setUploaded(data);
+      if (workspace !== "") {
+        const data = await getUploadedDatasets(workspace);
+        if (data) {
+          setUploaded(data);
+        }
       }
     };
     fetchData();
@@ -130,6 +142,7 @@ const UploadedDatasets = function () {
         </div>
         {modalOpened && (
           <UploadedModal
+            workspaceHandler={workspaceHandler}
             onClose={onClose}
             setRefresh={refreshHandler}
           ></UploadedModal>

@@ -23,10 +23,10 @@ export async function getServerStatus(): Promise<serverStatusType | null> {
   const prefix = "/server/status";
   return await getData<serverStatusType>(apiUrl + prefix);
 }
-export async function getUploadedDatasets(): Promise<
-  uploadedDatasetType[] | null
-> {
-  const prefix = "/dataset/uploaded";
+export async function getUploadedDatasets(
+  workspace: string,
+): Promise<uploadedDatasetType[] | null> {
+  const prefix = `/dataset/uploaded?wp_id=${workspace}`;
   return await getData<uploadedDatasetType[]>(apiUrl + prefix);
 }
 export async function deleteUploadedDatasets(fileId: string) {

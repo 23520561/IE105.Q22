@@ -1,3 +1,8 @@
+from app.dataset_transfer.service import cleanup_loop
+import asyncio
+from contextlib import asynccontextmanager
+from fastapi import Path
+import os
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,6 +32,15 @@ app.include_router(Imbalanced.router)
 app.include_router(FeatureEngineer.router)
 app.include_router(Pipeline.router)
 app.include_router(DecisionTree.router)
+
+
+@asynccontextmanager
+async def lifespan():
+    task = asyncio.create_task(cleanup_loop())
+
+    yield
+
+    task.cancel()
 
 
 @app.middleware("http")
