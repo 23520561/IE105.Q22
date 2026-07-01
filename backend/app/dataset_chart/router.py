@@ -5,7 +5,6 @@ from app.dataset_chart.schemas import PCAResponse
 from typing import List
 
 from app.dependencies.dataset_action import DatasetContext
-import pandas as pd
 from fastapi import APIRouter, Depends, Query
 
 from app.dataset_chart import service as ChartService
@@ -48,14 +47,13 @@ async def get_column_histogram(
 
 @router.get("/boxplot")
 async def get_boxplot_statistics(
-    column_name: str = Depends(
-        check_column_numberic
-    ),  # Column name of the numeric column to check
-    df: pd.DataFrame = Depends(
-        get_dataset
-    ),  # DataFrame passed via dependency injection
-) -> BoxPlotResponse:
-    return ChartService.get_boxplot_statistics(column_name, df)
+    subset: List[str] = Depends(check_columns_exist),
+    context: DatasetContext = Depends(get_dataset),
+) -> List[BoxPlotResponse]:
+    df = context.df
+    return [
+        ChartService.get_boxplot_statistics(column_name=col, df=df) for col in subset
+    ]
 
 
 @router.get("/heatmap")

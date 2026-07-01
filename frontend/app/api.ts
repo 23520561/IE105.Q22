@@ -2,10 +2,16 @@ import type { PipelineStepType } from "./pipeline/PipelineStepType";
 
 export const apiUrl: string = import.meta.env.VITE_API_URL;
 export const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
-export async function getData<T>(url: string): Promise<T | null> {
+export async function getData<T>(
+  url: string,
+  workspaceId: string = "",
+): Promise<T | null> {
   try {
     const response = await fetch(url, {
       method: "GET",
+      headers: {
+        "X-Session-Id": workspaceId,
+      },
     });
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);

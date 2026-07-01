@@ -26,8 +26,8 @@ export async function getServerStatus(): Promise<serverStatusType | null> {
 export async function getUploadedDatasets(
   workspace: string,
 ): Promise<uploadedDatasetType[] | null> {
-  const prefix = `/dataset/uploaded?wp_id=${workspace}`;
-  return await getData<uploadedDatasetType[]>(apiUrl + prefix);
+  const prefix = `/dataset/uploaded`;
+  return await getData<uploadedDatasetType[]>(apiUrl + prefix, workspace);
 }
 export async function deleteUploadedDatasets(fileId: string) {
   const prefix = `/dataset/uploaded?file_id=${fileId}`;

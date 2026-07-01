@@ -4,6 +4,7 @@ type stat = "count" | "mean" | "std" | "min" | "25%" | "50%" | "75%" | "max";
 export interface columnStat extends Record<stat, number | null> {
   type: string;
   selected: boolean;
+  unique_count: number;
 }
 export type columnsInfo = {
   shape: [number, number];

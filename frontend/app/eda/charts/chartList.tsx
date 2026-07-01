@@ -4,6 +4,7 @@ import HistogramChart from "./HistogramChart";
 import type { JSX } from "react";
 import KdeChart from "./KdeChart";
 import ScatterPlot from "./ScatterPlot";
+import BoxPlot from "./BoxPlot";
 export type plotType = {
   name: string;
   icon: string;
@@ -44,7 +45,7 @@ export const chartList: plotType[] = [
     icon: "candlestick_chart",
     requiredColumn: -1,
     component: ({ subset, datasetId }) => (
-      <HeatMap subset={subset} datasetId={datasetId}></HeatMap>
+      <BoxPlot subset={subset} datasetId={datasetId}></BoxPlot>
     ),
   },
   {

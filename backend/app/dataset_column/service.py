@@ -45,8 +45,10 @@ def get(
     # Get the columns as a list
     columnsInfo: Dict[Hashable, Dict[Hashable, Any]] = df.describe().T.to_dict("index")
     dtypes = df.dtypes.astype(str)
+    unique_counts = df.nunique(dropna=True)
     for col in columnsInfo:
         columnsInfo[col]["type"] = dtypes[str(col)]
+        columnsInfo[col]["unique_count"] = int(unique_counts[str(col)])
     # Get the first 5 rows (head) of the DataFrame
     rows = df.head().to_dict(orient="records")  # Convert to a list of dictionaries
     head = RowsResponse(rows=rows, count=len(rows))
