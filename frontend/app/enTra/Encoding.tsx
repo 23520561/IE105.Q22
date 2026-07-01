@@ -5,10 +5,12 @@ const Encoding = function ({
   encodingHandler,
   pipeline,
   selectedFeature,
+  uniqueCount,
 }: {
   encodingHandler: (method: EncodingMethodType, i: number) => void;
   pipeline: PipelineStepType[];
   selectedFeature: string;
+  uniqueCount: number;
 }) {
   return (
     <div className="p-6 bg-surface-container rounded-xl border-t-2 border-primary/20">
@@ -38,10 +40,12 @@ const Encoding = function ({
                   step.data.column === selectedFeature &&
                   step.data.method === method.toLowerCase(),
               );
+              const disabled = method === "one_hot" && uniqueCount > 5;
               return (
                 <button
-                  className={`px-3 py-2 text-[10px] font-bold rounded border border-outline-variant/10 transition-colors ${index !== -1 ? "bg-primary text-on-primary border-primary" : "bg-surface-container-lowest text-on-surface-variant hover:bg-surface-variant/40"} `}
+                  className={`px-3 py-2 text-[10px] font-bold rounded border border-outline-variant/10 transition-colors ${index !== -1 ? "bg-primary text-on-primary border-primary" : `${disabled ? "bg-error text-on-error" : "bg-surface-container-lowest text-on-surface-variant"}  hover:bg-surface-variant/40`}`}
                   onClick={() => encodingHandler(method, index)}
+                  disabled={disabled}
                 >
                   {method}
                 </button>
