@@ -14,7 +14,7 @@ const WrapFunction = function ({
   setWrapFunctions: (wrapFunctions: Func[]) => void;
 }) {
   const template = { id: crypto.randomUUID(), type: "pow", param: "2" };
-  const [funcs, setFuncs] = useState<Func[]>([template]);
+  const [funcs, setFuncs] = useState<Func[]>([]);
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState<Func | null>(null);

@@ -1,3 +1,4 @@
+import MoreInfo from "~/components/MoreInfo";
 import type { DecisionTreeNodeVisualization } from "./api";
 
 const NodeInsights = function ({
@@ -55,10 +56,11 @@ const NodeInsights = function ({
                   {(node.samples / totalSample) * 100}% of total set
                 </p>
               </div>
-              <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/5">
+              <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/5 relative group">
                 <p className="text-[10px] text-outline uppercase font-bold tracking-wider mb-1">
                   Gini Impurity
                 </p>
+
                 <p
                   className="text-2xl font-headline font-extrabold text-tertiary"
                   id="insight-gini"
@@ -72,16 +74,18 @@ const NodeInsights = function ({
                     style={{ width: "4.5%" }}
                   ></div>
                 </div>
+                <MoreInfo message="Measures how mixed the classes are (0 means perfectly pure, higher means more mixed)."></MoreInfo>
               </div>
             </div>
             {node.type === "split" && (
-              <div>
+              <div className="group relative">
                 <h4 className="text-xs font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-sm text-primary">
                     bar_chart
                   </span>
                   Feature Gini
                 </h4>
+                <MoreInfo message="How well this rule separates the data into different classes (lower is better)."></MoreInfo>
                 <div className="space-y-4">
                   {Object.keys(node.gini_history).map((val) => (
                     <div>
@@ -103,13 +107,14 @@ const NodeInsights = function ({
                 </div>
               </div>
             )}{" "}
-            <div>
+            <div className="group relative">
               <h4 className="text-xs font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-sm text-primary">
                   bar_chart
                 </span>
                 Label Distribution
               </h4>
+              <MoreInfo message="Percentage of samples that belong to each class."></MoreInfo>
               <div className="space-y-4">
                 {node.dist.map((val, i) => (
                   <div>

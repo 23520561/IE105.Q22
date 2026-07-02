@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { featureEngineering, type FeatureEngRequest } from "./api";
+import MoreInfo from "~/components/MoreInfo";
 
 type GroupByProps = {
   datasetId: string;
@@ -80,11 +81,10 @@ export const GroupBy = ({
       <div className="flex justify-between items-end mb-8">
         <div>
           <h1 className="text-3xl font-extrabold font-headline text-white tracking-tight">
-            Custom Expression Builder
+            Group-Based Features
           </h1>
           <p className="text-on-surface-variant mt-1 text-sm">
-            Configure logic gates and text transformations for the preprocessing
-            stream.
+            Calculate a summary value for each group and add it as a new column.
           </p>
         </div>
         <div className="flex gap-2">
@@ -109,11 +109,12 @@ export const GroupBy = ({
       <div className="bg-surface-container-low rounded-2xl p-1 space-y-10 relative overflow-hidden">
         {/* Group By Columns */}
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative group">
             <div className="w-1 h-6 bg-tertiary rounded-full"></div>
             <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">
               Group By Columns
             </h3>
+            <MoreInfo message="Columns used to group similar rows together."></MoreInfo>
           </div>
 
           <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-xl p-4 flex flex-wrap gap-2 min-h-14 items-center">
@@ -151,11 +152,12 @@ export const GroupBy = ({
         {/* Target Column */}
         <div className="grid md:grid-cols-2 gap-10">
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 group relative">
               <div className="w-1 h-6 bg-primary rounded-full"></div>
               <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">
                 Target Column
               </h3>
+              <MoreInfo message="The column you want to calculate a summary from."></MoreInfo>
             </div>
             <select
               value={form.targetColumn}
@@ -173,11 +175,12 @@ export const GroupBy = ({
 
           {/* New Column Name */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 group relative">
               <div className="w-1 h-6 bg-secondary rounded-full"></div>
               <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">
                 New Column Name
               </h3>
+              <MoreInfo message="Name of the new column that will store the result."></MoreInfo>
             </div>
             <div className="flex flex-col gap-1">
               <input
@@ -201,11 +204,12 @@ export const GroupBy = ({
 
         {/* Aggregation Functions */}
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 relative group">
             <div className="w-1 h-6 bg-tertiary-fixed rounded-full"></div>
             <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">
               Aggregation Functions
             </h3>
+            <MoreInfo message="The type of calculation to perform"></MoreInfo>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {AGG_OPTIONS.map((agg) => {

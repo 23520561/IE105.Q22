@@ -9,6 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import "react-tooltip/dist/react-tooltip.css";
 import NavigationBar from "./components/NavigationBar";
 import { SessionProvider } from "./workspaceProvider";
 

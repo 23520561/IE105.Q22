@@ -4,6 +4,7 @@ import {
   TransformationRequest,
   type TransformationMethodType,
 } from "./api";
+import MoreInfo from "~/components/MoreInfo";
 
 type Props = {
   datasetId: string;
@@ -85,33 +86,21 @@ const Transforming = function ({ datasetId, selectedColumns, refresh }: Props) {
               <button
                 disabled={loading}
                 onClick={() => handleTransform("log")}
-                className="flex-1 py-1.5 text-[10px] font-bold rounded bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-white transition-colors"
+                className="flex-1 py-1.5 text-[10px] font-bold rounded bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-white transition-colors relative group"
               >
+                <MoreInfo message="Shrinks large values and reduces extreme differences. Useful when some numbers are much bigger than others (like income or sales)."></MoreInfo>
                 Log
               </button>
 
               <button
                 disabled={loading}
                 onClick={() => handleTransform("sqrt")}
-                className="flex-1 py-1.5 text-[10px] font-bold rounded bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-white transition-colors"
+                className="flex-1 py-1.5 text-[10px] font-bold rounded bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-white transition-colors relative group"
               >
+                <MoreInfo message="Reduces the impact of large values while keeping small values more visible. Helps make data less uneven."></MoreInfo>
                 Sqrt
               </button>
             </div>
-          </div>
-
-          {/* Optional: map "clip" later if backend supports */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
-              Outliers
-            </label>
-
-            <button
-              disabled
-              className="w-full py-1.5 text-[10px] font-bold rounded bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant opacity-50 cursor-not-allowed"
-            >
-              Clip (coming soon)
-            </button>
           </div>
         </div>
       </div>

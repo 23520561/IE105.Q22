@@ -265,26 +265,18 @@ const UploadedModal = function ({
 
           <div className="px-8 py-6 bg-surface-container-lowest border-t border-outline-variant/10 flex items-center justify-between">
             <div className="flex items-center gap-4 text-on-surface-variant text-xs">
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm">
-                  security
-                </span>{" "}
-                Encrypted Transport
-              </span>
+              {/* <span className="flex items-center gap-1"> */}
+              {/*   <span className="material-symbols-outlined text-sm"> */}
+              {/*     security */}
+              {/*   </span>{" "} */}
+              {/*   Encrypted Transport */}
+              {/* </span> */}
               <span className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">
                   storage
                 </span>{" "}
                 50 MB Max
               </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="px-5 py-2.5 rounded-md text-secondary hover:bg-surface-variant/20 transition-all font-medium text-sm">
-                Cancel
-              </button>
-              <button className="px-6 py-2.5 rounded-md bg-linear-to-br from-primary to-on-primary-container text-on-primary font-bold text-sm shadow-lg shadow-primary/10 hover:shadow-primary/20 active:scale-95 transition-all">
-                Parse &amp; Preview
-              </button>
             </div>
           </div>
         </div>

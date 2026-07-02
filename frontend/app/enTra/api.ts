@@ -1,24 +1,45 @@
 import { apiUrl, postData } from "~/api";
-import type { PipelineStepType } from "~/pipeline/PipelineStepType";
 
 export type TransformationMethodType =
-  | "log"
-  | "sqrt"
-  | "minmax"
-  | "standard"
-  | "robust"
-  | "power"
-  | "normalize";
+  "log" | "sqrt" | "minmax" | "standard" | "robust" | "power" | "normalize";
 export const EncodingMethod = [
-  "one_hot",
-  "label",
-  "target",
-  "count",
-  "freq",
-  "binary",
-  "ordinal",
-];
-export type EncodingMethodType = (typeof EncodingMethod)[number];
+  {
+    name: "one_hot",
+    description:
+      "Creates a new binary column for each unique category. Best for features with a small number of unique values.",
+  },
+  {
+    name: "label",
+    description:
+      "Assigns each category a unique integer. Suitable for tree-based models, but may introduce an artificial order for other models.",
+  },
+  {
+    name: "target",
+    description:
+      "Replaces each category with a statistic (typically the mean) of the target variable. Useful for high-cardinality features but should be applied carefully to avoid data leakage.",
+  },
+  {
+    name: "count",
+    description:
+      "Replaces each category with the number of times it appears in the dataset. Suitable for features with many unique values.",
+  },
+  {
+    name: "freq",
+    description:
+      "Replaces each category with its relative frequency (proportion) in the dataset. Similar to count encoding but normalized.",
+  },
+  {
+    name: "binary",
+    description:
+      "Encodes categories as binary numbers across multiple columns. Uses fewer columns than one-hot encoding and works better for medium to high-cardinality features.",
+  },
+  {
+    name: "ordinal",
+    description:
+      "Maps categories to integers based on a specified order. Only use when the categories have a meaningful ranking (e.g. Low < Medium < High).",
+  },
+] as const;
+export type EncodingMethodType = (typeof EncodingMethod)[number]["name"];
 type EncodingData = {
   columns?: string[];
   column?: string;

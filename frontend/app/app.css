@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @theme static {
   /* 🎨 Colors */
   --color-on-secondary: #233143;
@@ -89,4 +90,9 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #2d3449;
+}
+.react-tooltip {
+  background: #233143 !important;
+  color: white !important;
+  border-radius: 6px;
 }
