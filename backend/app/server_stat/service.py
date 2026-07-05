@@ -2,13 +2,17 @@ from app.server_stat.schemas import ServerStatusResponse
 import psutil
 from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent
+UPLOAD_DIR = (BASE_DIR / "../../storage").resolve()
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def get_ram() -> float:
     return psutil.virtual_memory().percent
 
 
-def get_folder_size(path: str) -> int:
-    return sum(f.stat().st_size for f in Path(path).rglob("*") if f.is_file())
+def get_folder_size() -> int:
+    return sum(f.stat().st_size for f in Path(UPLOAD_DIR).rglob("*") if f.is_file())
 
 
 def format_size(bytes_val):
@@ -20,6 +24,4 @@ def format_size(bytes_val):
 
 
 def get_server_status():
-    return ServerStatusResponse(
-        ram=get_ram(), storage=format_size(get_folder_size("app/storage"))
-    )
+    return ServerStatusResponse(ram=get_ram(), storage=format_size(get_folder_size()))

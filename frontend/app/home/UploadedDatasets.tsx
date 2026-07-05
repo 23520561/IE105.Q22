@@ -1,27 +1,44 @@
-import { uploadedDataset } from "~/seed";
 import type { uploadedDatasetType } from "~/seed";
 import SearchBox from "~/components/SearchBox";
 import { useEffect, useState } from "react";
 import UploadedModal from "./UploadedModal";
-import { getUploadedDatasets } from "./api";
-import { useNavigate } from "react-router";
+import { deleteUploadedDatasets, getUploadedDatasets } from "./api";
 import { formatSize } from "./helper";
-const UploadedDatasets = function () {
+import { useSession } from "~/workspaceProvider";
+const UploadedDatasets = function ({
+  openHandler,
+}: {
+  openHandler: (s: string) => void;
+}) {
   const [modalOpened, setModalOpened] = useState(false);
   const [uploaded, setUploaded] = useState<uploadedDatasetType[]>([]);
-  const navigate = useNavigate();
+  const [refresh, setRefresh] = useState(false);
+  const { workspace, setWorkspace } = useSession();
+  function refreshHandler() {
+    setRefresh(!refresh);
+  }
   function onClose() {
     setModalOpened(false);
   }
+  function workspaceHandler() {
+    if (workspace === "") {
+      const id = crypto.randomUUID();
+      setWorkspace(id);
+      return id;
+    }
+    return workspace;
+  }
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getUploadedDatasets();
-      if (data) {
-        setUploaded(data);
+      if (workspace !== "") {
+        const data = await getUploadedDatasets(workspace);
+        if (data) {
+          setUploaded(data);
+        }
       }
     };
     fetchData();
-  }, []);
+  }, [refresh]);
   return (
     <>
       <div className="flex items-center justify-between">
@@ -35,47 +52,43 @@ const UploadedDatasets = function () {
       <div className="bg-surface-container-low rounded-xl overflow-hidden border border-white/5">
         <div className="divide-y divide-white/5">
           <SearchBox placeholder="Search library..."></SearchBox>
-          {uploadedDataset.map((dataset, i) => {
-            const color = ["sky", "green", "slate"][i % 3];
-            return (
-              <div
-                key={i}
-                className="px-4 py-3 flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`material-symbols-outlined text-${color}-400 text-lg`}
-                  >
-                    {dataset.name.includes(".csv")
-                      ? "table_chart"
-                      : "description"}
-                  </span>
-                  <div>
-                    <p className="text-xs font-medium text-on-surface">
-                      {dataset.name}
-                    </p>
-                    <p className="text-[9px] text-on-surface-variant tabular-nums">
-                      {`${dataset.size} • Modified ${dataset.dateModified}`}
-                    </p>
-                  </div>
-                </div>
-                <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                  download
-                </span>
-              </div>
-            );
-          })}
+          {/* {uploadedDataset.map((dataset, i) => { */}
+          {/*   const color = ["sky", "green", "slate"][i % 3]; */}
+          {/*   return ( */}
+          {/*     <div */}
+          {/*       key={i} */}
+          {/*       className="px-4 py-3 flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group" */}
+          {/*     > */}
+          {/*       <div className="flex items-center gap-3"> */}
+          {/*         <span */}
+          {/*           className={`material-symbols-outlined text-${color}-400 text-lg`} */}
+          {/*         > */}
+          {/*           {dataset.name.includes(".csv") */}
+          {/*             ? "table_chart" */}
+          {/*             : "description"} */}
+          {/*         </span> */}
+          {/*         <div> */}
+          {/*           <p className="text-xs font-medium text-on-surface"> */}
+          {/*             {dataset.name} */}
+          {/*           </p> */}
+          {/*           <p className="text-[9px] text-on-surface-variant tabular-nums"> */}
+          {/*             {`${dataset.size} • Modified ${dataset.dateModified}`} */}
+          {/*           </p> */}
+          {/*         </div> */}
+          {/*       </div> */}
+          {/*       <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity"> */}
+          {/*         download */}
+          {/*       </span> */}
+          {/*     </div> */}
+          {/*   ); */}
+          {/* })} */}
           {uploaded.map((dataset, i) => {
             const color = ["sky", "green", "slate"][i % 3];
             return (
               <div
                 key={i}
                 className="px-4 py-3 flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group"
-                onClick={() =>
-                  navigate(
-                    `encode&transform/${dataset.name.replace(".csv", "")}`,
-                  )
-                }
+                onClick={() => openHandler(dataset.id)}
               >
                 <div className="flex items-center gap-3">
                   <span
@@ -94,9 +107,17 @@ const UploadedDatasets = function () {
                     </p>
                   </div>
                 </div>
-                <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                  download
-                </span>
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    await deleteUploadedDatasets(dataset.name);
+                    refreshHandler();
+                  }}
+                >
+                  <span className="material-symbols-outlined text-slate-500 text-xs opacity-0 group-hover:opacity-100 group-hover:text-error transition-opacity">
+                    delete
+                  </span>
+                </button>
               </div>
             );
           })}
@@ -116,7 +137,13 @@ const UploadedDatasets = function () {
             </span>
           </div>
         </div>
-        {modalOpened && <UploadedModal onClose={onClose}></UploadedModal>}{" "}
+        {modalOpened && (
+          <UploadedModal
+            workspaceHandler={workspaceHandler}
+            onClose={onClose}
+            setRefresh={refreshHandler}
+          ></UploadedModal>
+        )}{" "}
       </div>
     </>
   );

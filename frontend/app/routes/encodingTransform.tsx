@@ -72,6 +72,7 @@ const EncodingTransform = function () {
                 encodingHandler={encodingHandler}
                 selectedFeature={selectedColumn}
                 pipeline={pipeline}
+                uniqueCount={info.columns[selectedColumn]?.unique_count || 0}
               ></Encoding>
 
               <Transforming

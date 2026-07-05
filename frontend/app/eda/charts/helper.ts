@@ -1,6 +1,18 @@
 import type { columnStat } from "../api";
-import type { histogramChartType } from "./api";
+import type { boxplotType, histogramChartType } from "./api";
 
+export function formatBoxPlot(data: boxplotType[]) {
+  let echartBoxes = [];
+  let columnNames = [];
+  let echartOutliners = [];
+  for (let i = 0; i < data.length; i++) {
+    const box = data[i];
+    echartBoxes.push([box.min, box.q1, box.median, box.q3, box.max]);
+    columnNames.push(box.column);
+    echartOutliners.push(...box.outliers.map((o) => [i, o]));
+  }
+  return { echartBoxes, columnNames, echartOutliners };
+}
 export function formatMatrix(
   matrix: number[][] | null,
 ): [number, number, number][] {

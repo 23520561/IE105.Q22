@@ -16,12 +16,16 @@ const BaseExpression = function ({
   };
 
   const [expr, setExpr] = useState<Expression>({
-    left: columns[0] || "",
-    op: ops[0],
-    right: columns[1] || columns[0] || "",
+    left: "Please choose your column",
+    op: "Please choose your operation",
+    right: "Please choose your column",
   });
   useEffect(() => {
-    setBaseExpr(`#${expr.left} ${expr.op} #${expr.right}`);
+    const expression = `[${expr.left}]${expr.op}[${expr.right}]`;
+    if (expression.includes("Please")) {
+      return;
+    }
+    setBaseExpr(`[${expr.left}]${expr.op}[${expr.right}]`);
   }, [expr]);
   return (
     <>
@@ -45,6 +49,11 @@ const BaseExpression = function ({
                 }
                 className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-2.5 text-sm appearance-none focus:outline-none focus:border-primary transition-colors"
               >
+                {
+                  <option key={1000} value={expr.left} selected disabled hidden>
+                    {expr.left}
+                  </option>
+                }
                 {columns.map((col) => (
                   <option key={col} value={col}>
                     {col}
@@ -70,6 +79,10 @@ const BaseExpression = function ({
                 }
                 className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-2.5 text-sm appearance-none focus:outline-none focus:border-primary transition-colors"
               >
+                <option key={expr.op} value={expr.op} selected disabled hidden>
+                  {expr.op}
+                </option>
+
                 {ops.map((op) => (
                   <option key={op} value={op}>
                     {op}
@@ -95,6 +108,15 @@ const BaseExpression = function ({
                 }
                 className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg px-4 py-2.5 text-sm appearance-none focus:outline-none focus:border-primary transition-colors"
               >
+                <option
+                  key={expr.right}
+                  value={expr.right}
+                  selected
+                  disabled
+                  hidden
+                >
+                  {expr.right}
+                </option>
                 {columns.map((col) => (
                   <option key={col} value={col}>
                     {col}

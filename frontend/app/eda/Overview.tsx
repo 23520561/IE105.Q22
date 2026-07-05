@@ -123,6 +123,17 @@ const EdaOverview = function ({
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-white/5">
+                  <span className="text-xs text-on-surface-variant">
+                    Unique Count
+                  </span>
+                  <span className="text-xs font-mono text-tertiary tabular-nums">
+                    {selectedColumn
+                      ? info.columns[selectedColumn].unique_count?.toFixed(2)
+                      : "--"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-white/5">
                   <span className="text-xs text-on-surface-variant">Min</span>
                   <span className="text-xs font-mono text-white tabular-nums">
                     {selectedColumn

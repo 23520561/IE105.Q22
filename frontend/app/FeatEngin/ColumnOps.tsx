@@ -56,11 +56,10 @@ const ColumnOps = function ({
       <div className="flex justify-between items-end mb-8">
         <div>
           <h1 className="text-3xl font-extrabold font-headline text-white tracking-tight">
-            Custom Expression Builder
+            Column Operations
           </h1>
           <p className="text-on-surface-variant mt-1 text-sm">
-            Configure logic gates and text transformations for the preprocessing
-            stream.
+            Transform and prepare your data by applying operations to columns.
           </p>
         </div>
         <div className="flex gap-2">

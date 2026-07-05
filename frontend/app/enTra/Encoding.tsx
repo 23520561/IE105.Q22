@@ -1,14 +1,17 @@
 import { EncodingMethod } from "./api";
 import type { PipelineStepType } from "../pipeline/PipelineStepType";
 import type { EncodingMethodType } from "./api";
+import MoreInfo from "~/components/MoreInfo";
 const Encoding = function ({
   encodingHandler,
   pipeline,
   selectedFeature,
+  uniqueCount,
 }: {
   encodingHandler: (method: EncodingMethodType, i: number) => void;
   pipeline: PipelineStepType[];
   selectedFeature: string;
+  uniqueCount: number;
 }) {
   return (
     <div className="p-6 bg-surface-container rounded-xl border-t-2 border-primary/20">
@@ -36,32 +39,23 @@ const Encoding = function ({
                 (step) =>
                   step.type === "encoding" &&
                   step.data.column === selectedFeature &&
-                  step.data.method === method.toLowerCase(),
+                  step.data.method === method.name.toLowerCase(),
               );
+              const disabled = method.name === "one_hot" && uniqueCount > 5;
               return (
-                <button
-                  className={`px-3 py-2 text-[10px] font-bold rounded border border-outline-variant/10 transition-colors ${index !== -1 ? "bg-primary text-on-primary border-primary" : "bg-surface-container-lowest text-on-surface-variant hover:bg-surface-variant/40"} `}
-                  onClick={() => encodingHandler(method, index)}
-                >
-                  {method}
-                </button>
+                <>
+                  <button
+                    className={`px-3 py-2 text-[10px] font-bold rounded border border-outline-variant/10 transition-colors ${index !== -1 ? "bg-primary text-on-primary border-primary" : `${disabled ? "bg-error text-on-error" : "bg-surface-container-lowest text-on-surface-variant"}  hover:bg-surface-variant/40`} relative group`}
+                    onClick={() => encodingHandler(method.name, index)}
+                    disabled={disabled}
+                  >
+                    <MoreInfo message={method.description}></MoreInfo>{" "}
+                    {method.name}
+                  </button>
+                </>
               );
             })}
           </div>
-        </div>
-        <div className="p-3 bg-surface-container-lowest rounded-md border border-outline-variant/10">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] text-on-surface-variant font-medium">
-              Drop First Category
-            </span>
-            <div className="w-8 h-4 bg-primary rounded-full relative cursor-pointer">
-              <div className="absolute right-0.5 top-0.5 w-3 h-3 bg-primary-container rounded-full"></div>
-            </div>
-          </div>
-          <p className="text-[10px] text-on-surface-variant/60">
-            Reduces multicollinearity in linear models by dropping the reference
-            level.
-          </p>
         </div>
       </div>
     </div>

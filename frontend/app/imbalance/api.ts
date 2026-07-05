@@ -9,19 +9,18 @@ export const ImbalancedInfo: ImbalancedInfoType[] = [
   {
     name: "SMOTE",
     description:
-      "Generates synthetic samples for the minority class using nearest neighbors to balance the dataset.",
+      "Create new examples for classes with fewer samples to balance your data.",
     method: "smote",
   },
   {
     name: "Undersampling",
-    description:
-      "Reduces the number of majority class samples to balance with the minority class.",
+    description: "Reduce classes with too many samples to balance your data.",
     method: "undersample",
   },
   {
     name: "Oversampling",
     description:
-      "Randomly duplicates samples from the minority class to increase its size and balance the dataset.",
+      "Increase classes with fewer samples by duplicating examples to balance your data.",
     method: "oversample",
   },
 ] as const;

@@ -36,7 +36,7 @@ const CustomExpressionBuilder = function ({
     let s = expr.baseExpr;
     for (let i = 0; i < expr.wrapFunctions.length; i++) {
       const fn = expr.wrapFunctions[i];
-      s = `@${fn.type}( ${s}, ${fn.param})`;
+      s = `@${fn.type}(${s},${fn.param})`;
     }
     return s;
   }
@@ -52,7 +52,18 @@ const CustomExpressionBuilder = function ({
     refreshHandler();
   }
   return (
-    <>
+    <div className="flex-1 flex flex-col p-1 overflow-y-auto">
+      <div className="flex justify-between items-end mb-8">
+        <div>
+          <h1 className="text-3xl font-extrabold font-headline text-white tracking-tight">
+            Calculated Column
+          </h1>
+          <p className="text-on-surface-variant mt-1 text-sm">
+            Create a new column from calculations on existing columns.
+          </p>
+        </div>
+      </div>
+
       <ColumnNameInput
         value={expr.newColName}
         onChange={setNewColName}
@@ -78,7 +89,7 @@ const CustomExpressionBuilder = function ({
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 export default CustomExpressionBuilder;

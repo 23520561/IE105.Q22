@@ -62,15 +62,17 @@ class ExpressionEvaluator:
                     func_stack.append([func_name, parameter1, parameter2])
 
                 tmp = ""
-            elif expression[self.index] == "#":
+            elif expression[self.index] == "[":
                 self.index += 1
                 col_name = ""
                 while (
                     self.index < expr_len
                     and expression[self.index] not in ops.keys()
-                    and expression[self.index] not in [")", ","]
+                    and expression[self.index] not in ["]"]
                 ):
                     col_name += expression[self.index]
+                    self.index += 1
+                if expression[self.index] == "]":
                     self.index += 1
 
                 if col_name not in self.dfs:
@@ -120,7 +122,7 @@ class ExpressionEvaluator:
             elif expression[self.index].isdigit():
                 tmp += expression[self.index]
             elif not expression[self.index].isdigit():
-                raise ValueError("Syntax error")
+                raise ValueError("Syntax error", expression[self.index])
             self.index += 1
 
     def exp_compiler(self, df: pd.DataFrame, expression: str, new_col: str):
@@ -129,7 +131,6 @@ class ExpressionEvaluator:
         self.valid_pan = []
         self.index = 0
         self.dfs = df
-        expression = expression.replace(" ", "")
         if expression[0] != "(" or expression[-1] != ")":
             expression = f"({expression})"
         self.check_syntax(expression, len(expression))

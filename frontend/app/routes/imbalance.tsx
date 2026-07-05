@@ -42,7 +42,7 @@ const Imbalance = function () {
       <div className=" space-y-8">
         <HeaderPreprocessing
           title="Handling Imbalanced Data"
-          desc="Refine your dataset distribution to ensure minor classes are accurately represented during model training."
+          desc="Balance your dataset so all classes have enough examples for training."
           nextStep={`/model-training/${datasetId}`}
           stepNumber={3}
         ></HeaderPreprocessing>

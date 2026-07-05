@@ -5,6 +5,8 @@ import PrebuiltDatasets from "~/home/PrebuiltDatasets";
 import SystemStatus from "~/components/SystemStatus";
 import { useEffect, useState } from "react";
 import { timeJoin } from "~/home/constants";
+import { getWorkspace } from "~/api";
+import CreateProjectModal from "~/home/CreateProjectModal";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "The Observational Engine | Dashboard" }];
@@ -12,7 +14,14 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   const [session, setSession] = useState(0);
+  const [datasetId, setDatasetId] = useState("");
   let mounted = true;
+  useEffect(() => {
+    const fetchData = async function () {
+      await getWorkspace();
+    };
+    fetchData();
+  }, []);
   useEffect(() => {
     setTimeout(async function clock() {
       if (!mounted) {
@@ -25,6 +34,12 @@ export default function Home() {
       mounted = false;
     };
   });
+  const closeHandler = function () {
+    setDatasetId("");
+  };
+  const openHandler = function (datasetId: string) {
+    setDatasetId(datasetId);
+  };
   return (
     <>
       <div className="grow bg-surface-dim p-8 overflow-y-auto">
@@ -39,7 +54,7 @@ export default function Home() {
               active
             </span>
           </div>
-          <PrebuiltDatasets></PrebuiltDatasets>
+          <PrebuiltDatasets openHandler={openHandler}></PrebuiltDatasets>
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -48,10 +63,16 @@ export default function Home() {
           </section>
 
           <section className="lg:col-span-4 space-y-6 pb-10">
-            <UploadedDatasets></UploadedDatasets>
+            <UploadedDatasets openHandler={openHandler}></UploadedDatasets>
           </section>
         </div>
         <SystemStatus></SystemStatus>
+        {datasetId !== "" && (
+          <CreateProjectModal
+            datasetId={datasetId}
+            closeHandler={closeHandler}
+          ></CreateProjectModal>
+        )}
       </div>
     </>
   );

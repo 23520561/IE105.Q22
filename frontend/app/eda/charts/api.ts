@@ -21,7 +21,30 @@ export async function getHistogramChart(
   const prefix = `/dataset/charts/histogram?${param}`;
   return await getData<histogramChartType>(apiUrl + prefix);
 }
-
+export type boxplotType = {
+  column: string;
+  min: number;
+  q1: number;
+  median: number;
+  q3: number;
+  max: number;
+  outliers: number[];
+  lower_bound: number;
+  upper_bound: number;
+};
+export async function getBoxPlot(
+  subset: string[],
+  datasetId: string,
+): Promise<boxplotType[] | null> {
+  const param = new URLSearchParams({
+    dataset_id: datasetId,
+  });
+  subset.forEach((s) => {
+    param.append("subset", s);
+  });
+  const prefix = `/dataset/charts/boxplot?${param}`;
+  return await getData<boxplotType[]>(apiUrl + prefix);
+}
 export type heatMapType = {
   labels: string[];
   matrix: number[][];
