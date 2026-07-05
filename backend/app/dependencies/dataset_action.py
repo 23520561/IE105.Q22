@@ -1,3 +1,6 @@
+from fastapi import Cookie
+from app.dependencies.session_manager import get_stored_project
+from app.dependencies.session_manager import get_stored_dataset
 from app.pipeline.schemas import StepType
 from dataclasses import dataclass
 from app.pipeline.service import load_pipeline
@@ -22,16 +25,15 @@ class DatasetContext:
     steps: list[StepType]
 
 
-def get_dataset(dataset_id: str = Query(...)):
+def get_origin_dataset(dataset_id: str = Query(...), x_session_id: str = Cookie(...)):
+    UPLOAD_DIR = (BASE_DIR / "../../storage").resolve()
     if dataset_id == "iris":
         from sklearn.datasets import load_iris
 
         data = cast(Bunch, load_iris())
         df = pd.DataFrame(data.data, columns=data.feature_names)
         df["target"] = data.target
-        steps = load_pipeline(dataset_id)
-        df = apply_pipeline(df, steps)
-        return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
+        return df
 
     elif dataset_id == "wine":
         from sklearn.datasets import load_wine
@@ -39,24 +41,30 @@ def get_dataset(dataset_id: str = Query(...)):
         data: Bunch = cast(Bunch, load_wine())
         df = pd.DataFrame(data.data, columns=data.feature_names)
         df["target"] = data.target
-        steps = load_pipeline(dataset_id)
-        df = apply_pipeline(df, steps)
-        return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
+        return df
     elif dataset_id == "breast":
         from sklearn.datasets import load_breast_cancer
 
         data: Bunch = cast(Bunch, load_breast_cancer())
         df = pd.DataFrame(data.data, columns=data.feature_names)
         df["target"] = data.target
-        steps = load_pipeline(dataset_id)
-        df = apply_pipeline(df, steps)
-        return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
-
-    UPLOAD_DIR = (BASE_DIR / "../../storage").resolve()
-    csv_path = UPLOAD_DIR / f"{dataset_id}.csv"
-
+        return df
+    stored_name = get_stored_dataset(session_id=x_session_id, dataset_id=dataset_id)
+    print(stored_name)
+    csv_path = UPLOAD_DIR / f"{stored_name}.csv"
     if csv_path.exists():
         df = pd.read_csv(csv_path)
+        return df
+    else:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+
+def get_dataset(dataset_id: str = Query(...), x_session_id: str = Cookie(...)):
+    UPLOAD_DIR = (BASE_DIR / "../../projects").resolve()
+    stored_name = get_stored_project(session_id=x_session_id, project_id=dataset_id)
+    pkl_path = UPLOAD_DIR / f"{stored_name}.pkl"
+    if pkl_path.exists():
+        df = pd.read_pickle(pkl_path)
         steps = load_pipeline(dataset_id)
         df = apply_pipeline(df, steps)
         return DatasetContext(
@@ -64,8 +72,9 @@ def get_dataset(dataset_id: str = Query(...)):
             df=df,
             steps=steps,
         )
+
     else:
-        raise HTTPException(status_code=404, detail="Dataset not found")
+        raise HTTPException(status_code=404, detail="Project not found")
 
 
 def check_column_exist(

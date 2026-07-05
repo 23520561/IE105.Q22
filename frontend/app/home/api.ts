@@ -1,6 +1,25 @@
-import { apiUrl, deleteData, getData } from "~/api";
+import { apiUrl, deleteData, getData, postData } from "~/api";
 import type { uploadedDatasetType } from "~/seed";
 
+export type projectResponseType = {
+  id: string;
+  name: string;
+  date: string;
+};
+export async function getProjects(): Promise<projectResponseType[] | null> {
+  const prefix = "/project";
+  return await getData<projectResponseType[]>(apiUrl + prefix);
+}
+export type projectRequestType = {
+  name: string;
+  dataset_id: string;
+};
+export async function createProjectName(
+  req: projectRequestType,
+): Promise<string | null> {
+  const prefix = "/project";
+  return await postData(apiUrl + prefix, req);
+}
 export type prebuiltDatasetType = {
   id: string;
   name: string;

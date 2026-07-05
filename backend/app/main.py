@@ -1,6 +1,7 @@
+from app.cleanup.service import lifespan
+from fastapi import Cookie
+from app.dependencies.session_manager import create_session
 from starlette.responses import Response
-import asyncio
-from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +14,6 @@ from app.dataset_chart import router as Chart
 from app.dataset_column import router as Column
 from app.dataset_eda import router as eda
 from app.dataset_transfer import router as Storage
-from app.dataset_transfer.service import cleanup_loop
 from app.decision_tree import router as DecisionTree
 from app.feature_encoding import router as Encoding
 from app.feature_engineering import router as FeatureEngineer
@@ -22,8 +22,9 @@ from app.feature_selection import router as FeatureSelection
 from app.feature_transformation import router as Transformation
 from app.pipeline import router as Pipeline
 from app.server_stat import router as ServerStat
+from app.dataset_project import router as Project
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 app.include_router(eda.router)
 app.include_router(ServerStat.router)
 app.include_router(Storage.router)
@@ -36,15 +37,7 @@ app.include_router(Imbalanced.router)
 app.include_router(FeatureEngineer.router)
 app.include_router(Pipeline.router)
 app.include_router(DecisionTree.router)
-
-
-@asynccontextmanager
-async def lifespan():
-    task = asyncio.create_task(cleanup_loop())
-
-    yield
-
-    task.cancel()
+app.include_router(Project.router)
 
 
 async def rate_limit_handler(
@@ -84,3 +77,14 @@ app.add_middleware(
 @app.get("/")
 async def read_main():
     return {"msg": "Hello World"}
+
+
+@app.get("/session")
+def get_session(response: Response, x_session_id=Cookie(None)):
+    if x_session_id:
+        return
+    id = create_session()
+    response.set_cookie(
+        key="x_session_id", value=str(id), httponly=True, secure=True, samesite="none"
+    )
+    return id

@@ -1,13 +1,14 @@
-from fastapi import Header
-from collections import defaultdict
-from app.dataset_transfer.service import save_file
 import json
-from fastapi import APIRouter, Query, WebSocket
+import uuid
+from collections import defaultdict
+
+from fastapi import APIRouter, Cookie, Query, WebSocket
 
 from app.dataset_transfer.service import (
     delete_file,
     get_uploaded_dataset,
     save_chunk,
+    save_file,
     validate_file,
 )
 
@@ -24,7 +25,7 @@ connections_per_ip = defaultdict(int)
 
 
 @router.get("/uploaded")
-def get_uploaded(x_session_id: str = Header(None)):
+def get_uploaded(x_session_id: str = Cookie(None)):
     return get_uploaded_dataset(x_session_id)
 
 
@@ -49,10 +50,10 @@ async def upload_dataset(ws: WebSocket):
     MAX_SIZE = 50 * 1024 * 1024
     message = await ws.receive_text()
     data = json.loads(message)
-    print(data)
 
-    session_id = data["sessionId"]
+    session_id = ws.cookies.get("x_session_id")
     file_name = data["fileName"]
+    stored_name = uuid.uuid4()
 
     if file_name:
         await ws.send_json({"type": "ready"})
@@ -71,11 +72,11 @@ async def upload_dataset(ws: WebSocket):
             )
             await ws.close(code=1009)
             return
-        await save_chunk(file_name, chunk)
+        await save_chunk(f"{str(stored_name)}.csv", chunk)
         await ws.send_json({"type": "progress", "uploaded_bytes": total_received})
-    save_file(session_id=session_id, file_name=file_name)
+    save_file(session_id=session_id, file_name=file_name, stored_name=stored_name)
     try:
-        await validate_file(file_name)
+        await validate_file(f"{stored_name}.csv")
         await ws.send_json({"type": "success"})
     except ValueError as e:
         await ws.send_json(
@@ -84,7 +85,7 @@ async def upload_dataset(ws: WebSocket):
                 "message": str(e),
             }
         )
-        await delete_file(file_name)  # cleanup
+        await delete_file(str(stored_name))  # cleanup
     finally:
         connections_per_ip[ip] -= 1
         await ws.close()

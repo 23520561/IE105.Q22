@@ -1,22 +1,26 @@
 import type { prebuiltDatasetType } from "./home/api";
 
 export type uploadedDatasetType = {
+  id: string;
   name: string;
   dateModified: string;
   size: `${number}${"MB" | "GB"}`;
 };
 export const uploadedDataset: uploadedDatasetType[] = [
   {
+    id: "ok",
     name: "user_logs_raw.csv",
     dateModified: "Nov 11",
     size: "4MB",
   },
   {
+    id: "ok",
     name: "some_templates.csv",
     dateModified: "Oct 8",
     size: "5GB",
   },
   {
+    id: "ok",
     name: "Some_other_templates.csv",
     dateModified: "Sep 12",
     size: "200MB",

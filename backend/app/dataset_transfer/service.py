@@ -1,5 +1,5 @@
-import asyncio
-from time import time
+from app.dependencies.session_manager import add_dataset
+from app.dependencies.session_manager import get_session
 from app.dataset_transfer.schemas import UploadedDataset
 from datetime import datetime
 import csv
@@ -10,39 +10,27 @@ BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = (BASE_DIR / "../../storage").resolve()
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-workspaces = {}
-
 
 def get_uploaded_dataset(wp_id: str):
     datasets = []
-    workspace = workspaces.get(wp_id, None)
-    if workspace:
-        for name in workspace:
+    session = get_session(wp_id)
+    if session:
+        workspace = session.datasets
+        for info in workspace:
+            name = f"{info.stored_name}.csv"
             file = UPLOAD_DIR / name
             stat = file.stat()
 
             datasets.append(
                 UploadedDataset(
-                    name=file.name,
+                    id=str(info.id),
+                    name=info.name,
                     dateModified=datetime.fromtimestamp(stat.st_mtime).strftime(
                         "%Y-%m-%d %H:%M:%S"
                     ),
                     size=stat.st_size,
                 )
             )
-
-    # for file in UPLOAD_DIR.glob("*.csv"):
-    #     stat = file.stat()
-    #
-    #     datasets.append(
-    #         UploadedDataset(
-    #             name=file.name,
-    #             dateModified=datetime.fromtimestamp(stat.st_mtime).strftime(
-    #                 "%Y-%m-%d %H:%M:%S"
-    #             ),
-    #             size=stat.st_size,
-    #         )
-    #     )
 
     return datasets
 
@@ -83,32 +71,14 @@ async def delete_file(file_name: str):
     os.remove(file_path)
 
 
-async def save_chunk(file_name, chunk):
+async def save_chunk(file_name: str, chunk):
     file_path = UPLOAD_DIR / file_name
     with open(file_path, "ab") as f:
         f.write(chunk)
 
 
-def save_file(file_name, session_id):
-    global workspaces
-    workspaces.setdefault(session_id, []).append(file_name)
+def save_file(file_name, session_id, stored_name):
+    add_dataset(session_id=session_id, name=file_name, stored_name=stored_name)
 
 
 MAX_AGE = 3600
-
-
-def cleanup_folder():
-    now = time()
-
-    for file in os.listdir(UPLOAD_DIR):
-        path = os.path.join(UPLOAD_DIR, file)
-
-        if os.path.isfile(path):
-            if now - os.path.getmtime(path) > MAX_AGE:
-                os.remove(path)
-
-
-async def cleanup_loop():
-    while True:
-        cleanup_folder()
-        await asyncio.sleep(60)
