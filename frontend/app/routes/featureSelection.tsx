@@ -8,7 +8,7 @@ import RankChart from "~/featureSelection/RankingChart";
 const FeatureEngineer = function () {
   const datasetId = useParams()?.datasetId ?? "";
   const { info } = useDataset(datasetId);
-  const [req, setReq] = useState<RfeRequest>(new RfeRequest(info.shape[1] - 1));
+  const [req, setReq] = useState<RfeRequest>(new RfeRequest(0));
   const [rfe, setRfe] = useState<RfeResponse | null>(null);
   async function executeHandler() {
     if (req) {

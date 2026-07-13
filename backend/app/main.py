@@ -22,6 +22,7 @@ from app.feature_selection import router as FeatureSelection
 from app.feature_transformation import router as Transformation
 from app.pipeline import router as Pipeline
 from app.server_stat import router as ServerStat
+from app.dataset_project import router as Project
 
 app = FastAPI()
 app.include_router(eda.router)
@@ -36,6 +37,7 @@ app.include_router(Imbalanced.router)
 app.include_router(FeatureEngineer.router)
 app.include_router(Pipeline.router)
 app.include_router(DecisionTree.router)
+app.include_router(Project.router)
 
 
 @asynccontextmanager
@@ -74,7 +76,7 @@ async def security_header(request: Request, call_next):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

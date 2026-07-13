@@ -2,28 +2,28 @@ import type { PipelineStepType } from "./pipeline/PipelineStepType";
 
 export const apiUrl: string = import.meta.env.VITE_API_URL;
 export const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL;
-export async function getData<T>(
-  url: string,
-  workspaceId: string = "",
-): Promise<T | null> {
+export class ApiError extends Error {
+  type: string;
+  constructor(
+    public status: number,
+    public message: string,
+  ) {
+    super(message);
+    this.type = "ApiError";
+  }
+}
+export async function getData<T>(url: string): Promise<T | null> {
   try {
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        "X-Session-Id": workspaceId,
-      },
+      credentials: "include",
     });
     if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
+      throw new ApiError(response.status, await response.json());
     }
     return await response.json();
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
-    } else {
-      console.error(err);
-    }
-    return null;
+  } catch (err) {
+    throw err;
   }
 }
 export async function delteData<T>(url: string): Promise<T | null> {
@@ -32,16 +32,11 @@ export async function delteData<T>(url: string): Promise<T | null> {
       method: "DELETE",
     });
     if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
+      throw new ApiError(response.status, await response.json());
     }
     return await response.json();
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
-    } else {
-      console.error(err);
-    }
-    return null;
+  } catch (err) {
+    throw err;
   }
 }
 export async function postData<T>(
@@ -51,22 +46,18 @@ export async function postData<T>(
   try {
     const response = await fetch(url, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(req),
     });
     if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
+      throw new ApiError(response.status, await response.json());
     }
     return await response.json();
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error(err.message);
-    } else {
-      console.error(err);
-    }
-    return null;
+  } catch (err) {
+    throw err;
   }
 }
 export async function deleteData<T>(url: string): Promise<T | null> {

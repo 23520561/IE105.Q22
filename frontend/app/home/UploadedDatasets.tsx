@@ -7,8 +7,12 @@ import { deleteUploadedDatasets, getUploadedDatasets } from "./api";
 import { useNavigate } from "react-router";
 import { formatSize } from "./helper";
 import { useSession } from "~/workspaceProvider";
-const UploadedDatasets = function () {
-  const [modalOpened, setModalOpened] = useState(false);
+import useModal from "~/customHooks/useModal";
+const UploadedDatasets = function ({
+  toggleAuthen,
+}: {
+  toggleAuthen: (b: boolean) => void;
+}) {
   const [uploaded, setUploaded] = useState<uploadedDatasetType[]>([]);
   const [refresh, setRefresh] = useState(false);
   const { workspace, setWorkspace } = useSession();
@@ -17,7 +21,7 @@ const UploadedDatasets = function () {
     setRefresh(!refresh);
   }
   function onClose() {
-    setModalOpened(false);
+    toggleModal(false);
   }
   function workspaceHandler() {
     if (workspace === "") {
@@ -30,7 +34,7 @@ const UploadedDatasets = function () {
   useEffect(() => {
     const fetchData = async () => {
       if (workspace !== "") {
-        const data = await getUploadedDatasets(workspace);
+        const data = await getUploadedDatasets();
         if (data) {
           setUploaded(data);
         }
@@ -38,6 +42,13 @@ const UploadedDatasets = function () {
     };
     fetchData();
   }, [refresh]);
+  const { customModal, toggleModal } = useModal((onClose) => (
+    <UploadedModal
+      workspaceHandler={workspaceHandler}
+      setRefresh={refreshHandler}
+      onClose={onClose}
+    ></UploadedModal>
+  ));
   return (
     <>
       <div className="flex items-center justify-between">
@@ -128,7 +139,8 @@ const UploadedDatasets = function () {
         <div
           className="p-4 bg-surface-container-low"
           onClick={() => {
-            setModalOpened(true);
+            // toggleModal(true);
+            toggleAuthen(true);
           }}
         >
           <div className="border-2 border-dashed border-outline-variant/20 rounded-lg p-6 flex flex-col items-center justify-center gap-2 hover:border-primary/40 transition-colors cursor-pointer group">
@@ -140,13 +152,14 @@ const UploadedDatasets = function () {
             </span>
           </div>
         </div>
-        {modalOpened && (
-          <UploadedModal
-            workspaceHandler={workspaceHandler}
-            onClose={onClose}
-            setRefresh={refreshHandler}
-          ></UploadedModal>
-        )}{" "}
+        {/* {showModal && ( */}
+        {/*   <UploadedModal */}
+        {/*     workspaceHandler={workspaceHandler} */}
+        {/*     onClose={onClose} */}
+        {/*     setRefresh={refreshHandler} */}
+        {/*   ></UploadedModal> */}
+        {/* )}{" "} */}
+        {customModal()}
       </div>
     </>
   );

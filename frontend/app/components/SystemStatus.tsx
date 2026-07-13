@@ -5,7 +5,7 @@ const SystemStatus = function () {
   const [status, setStatus] = useState<serverStatusType | null>(null);
   useEffect(() => {
     let mounted = true;
-    setTimeout(async function fetchData() {
+    async function fetchData() {
       if (!mounted) {
         return;
       }
@@ -16,7 +16,8 @@ const SystemStatus = function () {
         setStatus(data);
         setTimeout(fetchData, 10 * 1000);
       }
-    }, 10 * 1000);
+    }
+    fetchData();
     return () => {
       mounted = false;
     };

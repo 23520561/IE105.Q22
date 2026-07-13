@@ -52,11 +52,11 @@ def get_dataset(dataset_id: str = Query(...)):
         df = apply_pipeline(df, steps)
         return DatasetContext(dataset_id=dataset_id, df=df, steps=steps)
 
-    UPLOAD_DIR = (BASE_DIR / "../../storage").resolve()
-    csv_path = UPLOAD_DIR / f"{dataset_id}.csv"
+    UPLOAD_DIR = (BASE_DIR / "../../projects").resolve()
+    pkl_path = UPLOAD_DIR / f"{dataset_id}.pkl"
 
-    if csv_path.exists():
-        df = pd.read_csv(csv_path)
+    if pkl_path.exists():
+        df = pd.read_pickle(pkl_path)
         steps = load_pipeline(dataset_id)
         df = apply_pipeline(df, steps)
         return DatasetContext(
