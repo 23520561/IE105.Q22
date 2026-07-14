@@ -14,6 +14,14 @@ export async function isAuthenticated(
   }
   next();
 }
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+  });
+  res.json("ok");
+}
 export async function login(req: Request, res: Response, next: NextFunction) {
   await passport.authenticate("local", {
     failureMessage: true,

@@ -1,6 +1,13 @@
 import { apiUrl, deleteData, getData, postData } from "~/api";
 import type { uploadedDatasetType } from "~/seed";
 
+export type userProfileResponseType = {
+  username: string;
+};
+export async function getProfile() {
+  const prefix = "/user/profile";
+  return await getData<userProfileResponseType>(apiUrl + prefix);
+}
 export type projectResponseType = {
   id: string;
   name: string;

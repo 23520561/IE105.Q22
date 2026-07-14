@@ -11,6 +11,7 @@ import { apiUrl, getData, postData } from "./api.js";
 import { findProjectByIdAndUserId } from "./db/project.js";
 import { isAuthenticated } from "./controllers/authentication.js";
 import datasetRoute from "./routes/prebuiltdataset.js";
+import usersRoute from "./routes/users.js";
 
 const pgStore = connectPg(session);
 
@@ -39,6 +40,7 @@ app.use(
 app.use(passport.session());
 app.use("/dataset", datasetRoute);
 app.use("/project", projectRoute);
+app.use("/user", usersRoute);
 app.use(authenRouter);
 app.get("/*splat", isAuthenticated, async (req: Request, res: Response) => {
   if (!req.user) {

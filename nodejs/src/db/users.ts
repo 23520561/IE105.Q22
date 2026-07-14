@@ -5,7 +5,7 @@ export type usersSchema = {
   username: string;
   password: string;
 };
-async function findUserById(id: string) {
+async function findUserById(id: string): Promise<usersSchema> {
   const { rows } = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
   return rows[0];
 }

@@ -8,8 +8,8 @@ const LoginSignupModal = function ({
 }) {
   const [isLoginPage, setIsLoginPage] = useState(true);
   const [hidePassword, setHidePassword] = useState(true);
-  const [password, setPassword] = useState<string | undefined>(undefined);
-  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [error, setError] = useState<string | undefined>(undefined);
   async function submitHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,6 +21,7 @@ const LoginSignupModal = function ({
       if (isLoginPage) {
         await login({ username: username, password: password });
         closeHandler();
+        window.location.reload();
       } else {
         await signup({ username: username, password: password });
       }

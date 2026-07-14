@@ -1,5 +1,10 @@
 import { Router, type Request, type Response } from "express";
-import { login, signup } from "~/controllers/authentication.js";
+import {
+  isAuthenticated,
+  login,
+  logout,
+  signup,
+} from "~/controllers/authentication.js";
 
 const authenRouter = Router();
 
@@ -24,7 +29,10 @@ authenRouter.get("/login", (req: Request, res: Response) => {
     </form>
   `);
 });
-authenRouter.post("/login", login, (req, res) => res.send("ok"));
+authenRouter.post("/login", login, (req, res) => {
+  res.json("ok");
+});
+authenRouter.get("/logout", isAuthenticated, logout);
 authenRouter.post("/signup", signup);
 
 export default authenRouter;

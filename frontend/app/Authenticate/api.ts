@@ -1,4 +1,4 @@
-import { apiUrl, postData } from "~/api";
+import { apiUrl, getData, postData } from "~/api";
 
 export type authenticateRequest = {
   username: string;
@@ -11,4 +11,8 @@ export async function login(req: authenticateRequest) {
 export async function signup(req: authenticateRequest) {
   const prefix = "/signup";
   return await postData(apiUrl + prefix, req);
+}
+export async function logout() {
+  const prefix = "/logout";
+  return await getData(apiUrl + prefix);
 }
