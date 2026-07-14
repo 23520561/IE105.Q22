@@ -18,13 +18,12 @@ const LoginSignupModal = function ({
       return;
     }
     try {
-      if (isLoginPage) {
-        await login({ username: username, password: password });
-        closeHandler();
-        window.location.reload();
-      } else {
+      if (!isLoginPage) {
         await signup({ username: username, password: password });
       }
+      await login({ username: username, password: password });
+      closeHandler();
+      window.location.reload();
     } catch (err) {
       setError("Incorrect username or password");
     }
@@ -155,7 +154,7 @@ const LoginSignupModal = function ({
               className="w-full py-3.5  bg-primary text-on-primary font-bold rounded shadow-lg shadow-primary/10 hover:scale-95 active:scale-[0.98] transition-all duration-200"
               id="primaryCta"
             >
-              Sign In
+              {isLoginPage ? "Sign In" : "Sign Up"}
             </button>
 
             <div className="relative flex items-center py-4">

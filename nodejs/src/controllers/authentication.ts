@@ -44,7 +44,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
       await bcrypt.hash(password, Number(process.env.SALT_NUMBER) || 10)
     ).toString();
     await createUser(username, hashed);
-    res.send("ok");
+    res.json("ok");
   } catch (err) {
     next(err);
   }
