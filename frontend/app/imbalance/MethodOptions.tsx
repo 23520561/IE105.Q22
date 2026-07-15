@@ -1,6 +1,6 @@
 import { ImbalancedInfo, type ImbalancedMethod } from "./api";
 
-const MethodOptions = function ({
+const MethodOptions = function({
   method,
   methodChangeHandler,
 }: {
@@ -14,7 +14,7 @@ const MethodOptions = function ({
       </label>
       <div className="grid gap-4">
         {ImbalancedInfo.map((imbalance) => (
-          <label className="group cursor-pointer">
+          <label key={imbalance.method} className="group cursor-pointer">
             <input
               onChange={() => methodChangeHandler(imbalance.method)}
               className="hidden peer"

@@ -5,7 +5,7 @@ import { useDataset } from "~/customHooks/useDataset";
 import { getRfe, RfeRequest, type RfeResponse } from "~/featureSelection/api";
 import RankChart from "~/featureSelection/RankingChart";
 
-const FeatureEngineer = function () {
+const FeatureEngineer = function() {
   const datasetId = useParams()?.datasetId ?? "";
   const { info } = useDataset(datasetId);
   const [req, setReq] = useState<RfeRequest>(new RfeRequest(0));
@@ -38,7 +38,6 @@ const FeatureEngineer = function () {
               <div className="grid gap-3">
                 <label className="cursor-pointer">
                   <input
-                    checked={false}
                     className="hidden peer"
                     name="method"
                     type="radio"
@@ -81,6 +80,7 @@ const FeatureEngineer = function () {
                     className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
                     type="number"
                     value="1"
+                    readOnly={true}
                   />
                 </div>
                 <div className="pt-4 border-t border-outline-variant/10">

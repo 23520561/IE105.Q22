@@ -2,13 +2,12 @@ import { useEffect, useState } from "react";
 import { logout } from "~/Authenticate/api";
 import { getProfile, type userProfileResponseType } from "~/home/api";
 
-const NavigationBar = function () {
+const NavigationBar = function() {
   const [userProfile, setUserProfile] = useState<userProfileResponseType>();
   const [openDetail, setOpenDetail] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getProfile();
-      console.log(data);
       if (!data) {
         return;
       }

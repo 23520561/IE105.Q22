@@ -12,7 +12,7 @@ export function PipelineList({
   deleteHandler: (i: number) => void;
 }) {
   return (
-    <div className="bg-surface-container rounded-xl p-6 border border-white/5 min-h-[calc(5*5rem)] max-h-[20vh] overflow-y-auto">
+    <div className="bg-surface-container rounded-xl p-6 border border-white/5 min-h-100 max-h-[20vh] overflow-y-auto">
       <h4 className="text-xs font-bold text-white mb-4 flex items-center gap-2">
         <span className="material-symbols-outlined text-sm">account_tree</span>
         Pipeline
@@ -28,6 +28,7 @@ export function PipelineList({
             case "encoding":
               return (
                 <EncodingStep
+                  key={i}
                   item={step.data}
                   onRemove={() => deleteHandler(i)}
                 ></EncodingStep>
@@ -35,6 +36,7 @@ export function PipelineList({
             case "transform":
               return (
                 <TransformStep
+                  key={i}
                   step={step.data}
                   onRemove={() => deleteHandler(i)}
                 ></TransformStep>
@@ -42,6 +44,7 @@ export function PipelineList({
             case "engineer":
               return (
                 <EngineerStep
+                  key={i}
                   step={step.data}
                   onRemove={() => deleteHandler(i)}
                 ></EngineerStep>
@@ -49,6 +52,7 @@ export function PipelineList({
             case "imbalance":
               return (
                 <ImbalancedStep
+                  key={i}
                   item={step.data}
                   onRemove={() => deleteHandler(i)}
                 ></ImbalancedStep>

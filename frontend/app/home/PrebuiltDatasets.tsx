@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPrebuiltDatasets } from "./api";
 import type { prebuiltDatasetType } from "./api";
-const PrebuiltDatasets = function ({
+const PrebuiltDatasets = function({
   openHandler,
 }: {
   openHandler: (s: string) => void;
@@ -30,6 +30,7 @@ const PrebuiltDatasets = function ({
         const color = ["primary", "tertiary", "secondary"][i % 3];
         return (
           <div
+            key={dataset.id}
             // to={`/feature-selection/${dataset.id}`}
             onClick={() => openHandler(dataset.id)}
             // state={{ datasetId: dataset.id }}            key={i}

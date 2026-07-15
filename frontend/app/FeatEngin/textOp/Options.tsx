@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const Options = function ({
+const Options = function({
   columns,
   isDisable,
   updateOperationHandler,
@@ -29,7 +29,7 @@ const Options = function ({
           className="w-full bg-surface-container-lowest border-outline-variant/30 rounded-lg text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary h-10 px-3 transition-all"
         >
           {columns.map((col) => (
-            <option>{col}</option>
+            <option key={col}>{col}</option>
           ))}
         </select>
       </div>

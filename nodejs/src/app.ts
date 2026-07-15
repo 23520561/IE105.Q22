@@ -7,7 +7,7 @@ import authenRouter from "./routes/authentication.js";
 import passport from "passport";
 import "./config/passport.js";
 import projectRoute from "./routes/project.js";
-import { apiUrl, getData, postData } from "./api.js";
+import { apiUrl, deleteData, getData, postData } from "./api.js";
 import { findProjectByIdAndUserId } from "./db/project.js";
 import { isAuthenticated } from "./controllers/authentication.js";
 import datasetRoute from "./routes/prebuiltdataset.js";
@@ -42,24 +42,58 @@ app.use("/dataset", datasetRoute);
 app.use("/project", projectRoute);
 app.use("/user", usersRoute);
 app.use(authenRouter);
-app.get("/*splat", isAuthenticated, async (req: Request, res: Response) => {
-  if (!req.user) {
-    throw new Error("Authentication not working");
-  }
-  res.json(await getData(apiUrl + req.url));
-});
-app.post("/", isAuthenticated, async (req: Request, res: Response) => {
-  if (!req.user) {
-    throw new Error("Authentication not working");
-  }
-  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  if (!id) {
-    throw new Error("No params");
-  }
-  const filename = (await findProjectByIdAndUserId(id, req.user.id)).filename;
+app.get(
+  "/*splat",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new Error("Authentication not working");
+    }
+    const id = req.query.dataset_id?.toString();
+    if (!id) {
+      res.json(await getData((apiUrl + req.originalUrl)));
+      return;
+    }
+    const filename = (await findProjectByIdAndUserId(id, req.user.id)).filename;
+    res.json(await getData((apiUrl + req.originalUrl).replace(id, filename)));
+  },
+);
+app.delete(
+  "/*splat",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new Error("Authentication not working");
+    }
+    const id = req.query.dataset_id?.toString();
+    if (!id) {
+      console.log(req.originalUrl);
+      throw new Error("No params");
+    }
+    const filename = (await findProjectByIdAndUserId(id, req.user.id)).filename;
+    res.json(await deleteData((apiUrl + req.originalUrl).replace(id, filename)));
+  },
+);
+app.post(
+  "/*splat",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    if (!req.user) {
+      throw new Error("Authentication not working");
+    }
+    const id = req.query.dataset_id?.toString();
+    if (!id) {
+      console.log(req.query);
+      throw new Error("No params");
+    }
+    const filename = (await findProjectByIdAndUserId(id, req.user.id)).filename;
 
-  res.json(postData((apiUrl + req.url).replace(id, filename), req.body));
-});
+    res.json(
+      await postData((apiUrl + req.originalUrl).replace(id, filename), req.body),
+    );
+  },
+);
+
 const PORT = process.env.PORT;
 app.listen(PORT, (err) => {
   if (err) {

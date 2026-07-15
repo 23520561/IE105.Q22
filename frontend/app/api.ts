@@ -26,19 +26,6 @@ export async function getData<T>(url: string): Promise<T | null> {
     throw err;
   }
 }
-export async function delteData<T>(url: string): Promise<T | null> {
-  try {
-    const response = await fetch(url, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new ApiError(response.status, await response.json());
-    }
-    return await response.json();
-  } catch (err) {
-    throw err;
-  }
-}
 export async function postData<T>(
   url: string,
   req: Record<string, any>,
@@ -64,6 +51,7 @@ export async function deleteData<T>(url: string): Promise<T | null> {
   try {
     const response = await fetch(url, {
       method: "DELETE",
+      credentials: "include",
     });
     if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);

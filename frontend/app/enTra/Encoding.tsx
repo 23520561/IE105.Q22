@@ -2,7 +2,7 @@ import { EncodingMethod } from "./api";
 import type { PipelineStepType } from "../pipeline/PipelineStepType";
 import type { EncodingMethodType } from "./api";
 import MoreInfo from "~/components/MoreInfo";
-const Encoding = function ({
+const Encoding = function({
   encodingHandler,
   pipeline,
   selectedFeature,
@@ -43,16 +43,15 @@ const Encoding = function ({
               );
               const disabled = method.name === "one_hot" && uniqueCount > 5;
               return (
-                <>
-                  <button
-                    className={`px-3 py-2 text-[10px] font-bold rounded border border-outline-variant/10 transition-colors ${index !== -1 ? "bg-primary text-on-primary border-primary" : `${disabled ? "bg-error text-on-error" : "bg-surface-container-lowest text-on-surface-variant"}  hover:bg-surface-variant/40`} relative group`}
-                    onClick={() => encodingHandler(method.name, index)}
-                    disabled={disabled}
-                  >
-                    <MoreInfo message={method.description}></MoreInfo>{" "}
-                    {method.name}
-                  </button>
-                </>
+                <button
+                  key={method.name}
+                  className={`px-3 py-2 text-[10px] font-bold rounded border border-outline-variant/10 transition-colors ${index !== -1 ? "bg-primary text-on-primary border-primary" : `${disabled ? "bg-error text-on-error" : "bg-surface-container-lowest text-on-surface-variant"}  hover:bg-surface-variant/40`} relative group`}
+                  onClick={() => encodingHandler(method.name, index)}
+                  disabled={disabled}
+                >
+                  <MoreInfo message={method.description}></MoreInfo>{" "}
+                  {method.name}
+                </button>
               );
             })}
           </div>
