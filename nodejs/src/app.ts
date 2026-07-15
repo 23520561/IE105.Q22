@@ -18,7 +18,7 @@ const pgStore = connectPg(session);
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_API,
     credentials: true,
   }),
 );
