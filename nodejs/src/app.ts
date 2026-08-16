@@ -65,7 +65,9 @@ app.delete(
     if (!req.user) {
       throw new Error("Authentication not working");
     }
-    const id = req.query.dataset_id?.toString();
+    const id = (
+  req.query.dataset_id ?? req.query.node_id
+)?.toString();
     if (!id) {
       console.log(req.originalUrl);
       throw new Error("No params");
@@ -81,7 +83,9 @@ app.post(
     if (!req.user) {
       throw new Error("Authentication not working");
     }
-    const id = req.query.dataset_id?.toString();
+    const id = (
+  req.query.dataset_id ?? req.query.node_id
+)?.toString();
     if (!id) {
       console.log(req.query);
       throw new Error("No params");
