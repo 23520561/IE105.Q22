@@ -43,6 +43,31 @@ app.use("/project", projectRoute);
 app.use("/user", usersRoute);
 app.use(authenRouter);
 app.get(
+  "/tree",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    res.json(await getData(apiUrl + req.originalUrl));
+  },
+);
+
+app.post(
+  "/tree",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    res.json(
+      await postData(apiUrl + req.originalUrl, req.body),
+    );
+  },
+);
+
+app.delete(
+  "/tree",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    res.json(await deleteData(apiUrl + req.originalUrl));
+  },
+);
+app.get(
   "/*splat",
   isAuthenticated,
   async (req: Request, res: Response) => {
@@ -65,9 +90,7 @@ app.delete(
     if (!req.user) {
       throw new Error("Authentication not working");
     }
-    const id = (
-  req.query.dataset_id ?? req.query.node_id
-)?.toString();
+    const id = req.query.dataset_id?.toString();
     if (!id) {
       console.log(req.originalUrl);
       throw new Error("No params");
@@ -83,9 +106,7 @@ app.post(
     if (!req.user) {
       throw new Error("Authentication not working");
     }
-    const id = (
-  req.query.dataset_id ?? req.query.node_id
-)?.toString();
+    const id = req.query.dataset_id?.toString();
     if (!id) {
       console.log(req.query);
       throw new Error("No params");
