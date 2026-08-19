@@ -44,11 +44,11 @@ app.use("/user", usersRoute);
 app.use(authenRouter);
 
 app.post(
-  "/tree",
+  "/model/decision-tree/split",
   isAuthenticated,
   async (req: Request, res: Response) => {
     res.json(
-      await postData(apiUrl + req.originalUrl, req.body),
+      await postData(apiUrl + req.originalUrl, req.body)
     );
   },
 );
