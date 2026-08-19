@@ -42,13 +42,6 @@ app.use("/dataset", datasetRoute);
 app.use("/project", projectRoute);
 app.use("/user", usersRoute);
 app.use(authenRouter);
-app.get(
-  "/tree",
-  isAuthenticated,
-  async (req: Request, res: Response) => {
-    res.json(await getData(apiUrl + req.originalUrl));
-  },
-);
 
 app.post(
   "/tree",
